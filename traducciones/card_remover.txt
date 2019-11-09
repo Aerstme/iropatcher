@@ -1,0 +1,102 @@
+//===== rAthena Script =======================================
+//= Card Removal NPC
+//===== By: ==================================================
+//= TyrNemesis^
+//===== Current Version: =====================================
+//= 1.2a
+//===== Compatible With: =====================================
+//= rAthena Project
+//===== Description: =========================================
+//= Removes cards from equipped items.
+//===== Additional Comments: =================================
+//= 1.0 First version. [TyrNemesis^]
+//= 1.2 Optimized and fixed getequipname menu. [Kisuka]
+//= 1.2a Added 'disable_items' command. [Euphy]
+//============================================================
+
+prontera,164,151,3	script	Card Remover	91,{
+
+	set .zenycost,200000;    // base cost of the card remover services (in Zeny)
+	set .percardcost,40000;  // cost per card of the card remover services (in Zeny)
+	set .faildestroy,0;      // should the card remover have a chance of failure that destroys items? (1=yes, 0=no)
+
+	disable_items;
+	mes "[ ^00BFFF^00BFFFCard Remover^000000^000000 ]";
+	mes "Hola!";
+	mes "Conmigo podrás ^800080remover^000000 todas las ^1E90FFcartas^000000 de tus ^FF8C00items^000000";
+	mes "Te agrada esta idea?";
+	next;
+	switch(select("~ ^009900Si, por favor!^000000:~ Información:~ ^FF0000No, gracias!^000000")) {
+	case 1:
+		mes "[ ^00BFFF^00BFFFCard Remover^000000^000000 ]";
+		mes "Muy bien.";
+		mes "Qué ^FF8C00item^000000 quieres que ^800080examine^000000?";
+		next;
+
+		setarray .@indices[1], EQI_HEAD_TOP, EQI_ARMOR, EQI_HAND_L, EQI_HAND_R, EQI_GARMENT, EQI_SHOES, EQI_ACC_L, EQI_ACC_R, EQI_HEAD_MID, EQI_HEAD_LOW;
+		for( set .@i,1; .@i <= 10; set .@i,.@i+1 ) {
+			if( getequipisequiped(.@indices[.@i]) )
+				set .@menu$, .@menu$ + F_getpositionname(.@indices[.@i]) + "-[" + getequipname(.@indices[.@i]) + "]";
+			set .@menu$, .@menu$ + ":";
+		}
+		set .@part, .@indices[ select(.@menu$) ];
+		if(!getequipisequiped(.@part)) {
+			mes "[ ^00BFFF^00BFFFCard Remover^000000^000000 ]";
+			mes "~ ^FF0000No llevas nada equipado a lo que le pueda remover la carta.^000000";
+			close;
+		}
+		if(getequipcardcnt(.@part) == 0) {
+			mes "[ ^00BFFF^00BFFFCard Remover^000000^000000 ]";
+			mes "~ ^FF0000Este item no tiene ninguna carta.^000000";
+			close;
+		}
+		set .@cardcount,getequipcardcnt(.@part);
+		
+		if (!checkweight(1202,(.@cardcount+1))) { 
+			mes "[ ^00BFFF^00BFFFCard Remover^000000^000000 ]";
+			mes "~ ^FF0000Estás con sobrepeso, ve a vaciar tu inventario y vuelve.^000000";
+			close;
+		}
+		mes "[ ^00BFFF^00BFFFCard Remover^000000^000000 ]";
+		mes "Este ^800080item^000000 tiene " + .@cardcount + " ^1E90FFcarta^000000.";
+		mes "^009900Necesitaré^000000 " + (.zenycost+(.@cardcount * .percardcost)) + "z, un ^FF8C00Star Crumb^000000 y una ^FF8C00Yellow Gemstone^000000.";
+		mes "Tienes lo que necesito?";
+		next;
+		if(select("~ ^009900Entregar todo^000000:~ ^FF0000No^000000, aún no") == 2) {
+			mes "[ ^00BFFF^00BFFFCard Remover^000000^000000 ]";
+			mes "Bueno... ^FF6133vuelve^000000 cuando quieras ^^";
+			close;
+		}
+		if((zeny < (.zenycost+(.@cardcount * .percardcost))) || (countitem(1000) < 1) || (countitem(715) < 1)) {
+			mes "[ ^00BFFF^00BFFFCard Remover^000000^000000 ]";
+			mes "~ ^FF0000Lo siento, no tienes todo lo que necesito para poder remover tu carta.^000000";
+			close;
+		}
+		set Zeny, Zeny - (.zenycost+(.@cardcount * .percardcost));
+		delitem 1000,1; //Star_Crumb
+		delitem 715,1; //Yellow_Gemstone
+		
+		successremovecards .@part;
+		mes "[ ^00BFFF^00BFFFCard Remover^000000^000000 ]";
+		mes "^009900¡Listo!^000000";
+		mes "^FF6133Vuelve^000000 cuando quieras ^^";
+		close;
+	case 2:
+		mes "[ ^00BFFF^00BFFFCard Remover^000000^000000 ]";
+		mes "Cobro una ^1E90FFtarifa plana^000000 de "+callfunc("F_InsertComma",.zenycost)+"z. ^FF6133Adicionalmente^000000, por cada carta que remueva, te cobraré "+callfunc("F_InsertComma",.percardcost)+"z. Y ^009900necesito^000000 que me traigas un ^FF8C00Star Crumb^000000 y una ^FF8C00Yellow Gemstone^000000.";
+		close;
+	case 3:
+		mes "[ ^00BFFF^00BFFFCard Remover^000000^000000 ]";
+		mes "Bueno... ^FF6133vuelve^000000 cuando quieras ^^";
+		close;
+	}
+OnInit:
+		waitingroom "[ Card Remover ]",0;
+end;
+
+}
+
+// Duplicates
+//============================================================
+payon,166,114,5	duplicate(Card Remover)	Card Remover#pay	91
+rachel,125,93,6	duplicate(Card Remover)	Card Remover#rac	91

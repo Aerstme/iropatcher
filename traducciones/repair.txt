@@ -1,0 +1,81 @@
+prontera,164,155,3	script	Repair Man	851,{
+	.@repairprice = 70000;
+	.@npc_name$ = "^00BFFF^00BFFFRepair Man^000000^000000";
+	mes "[ "+ .@npc_name$ +" ]";
+	mes "Hola!";
+	mes "Soy el ^800080reparador^000000 oficial de Rune Midgard.";
+	mes "Conmigo podrás ^800080reparar^000000 todos tus ^FF8C00items^000000.";
+	mes "Te gustaría ^800080repararlos^000000?";
+	next;
+	switch(select("~ ^009900Entregar Item(s)^000000:~ ^FF0000No^000000 quiero, gracias.")) {
+	case 1:
+		.@checkitem = 1;
+		while (1) {
+			if (getbrokenid(.@checkitem) == 0) {
+				break;
+			}
+			.@checkitem = .@checkitem+1;
+		}
+		.@checkitem = .@checkitem-1;
+		if (!.@checkitem) {
+			mes "[ "+ .@npc_name$ +" ]";
+			mes "~ ^FF0000Al parecer cuidas bien tus cosas, no tienes nada para reparar... con personas como tú, me quedaré sin empleo!!^000000";
+			close;
+		}
+		mes "[ "+ .@npc_name$ +" ]";
+		mes "Hmm...";
+		mes "Veamos que tienes...";
+		mes "Tienes " + .@checkitem + " item(s) dañado(s).";
+		mes "Te gustaría ^800080repararlo(s)^000000 ahora?";
+		next;
+		.@totalcost = .@repairprice*.@checkitem;
+		mes "[ "+ .@npc_name$ +" ]";
+		mes "Cada ^800080reparación^000000 cuesta " + .@repairprice + "z.";
+		mes "Así que ^FF8C00todo^000000 saldría por " + .@totalcost + "z."; 
+		mes "Estás ^009900conforme^000000?";
+		next;
+		switch(select("~ ^009900Sí^000000:~ ^FF0000No^000000")) {
+		case 1:
+			if (Zeny < .@totalcost) {
+				mes "[ "+ .@npc_name$ +" ]";
+				mes "~ ^FF0000Lo siento, no tienes Zeny suficiente para reparar tu(s) Item(s).^000000";
+				close;
+			}
+			.@checkitem2 = 1;
+			while (1) {
+				if (getbrokenid(.@checkitem2) == 0) {
+					break;
+				}
+				.@checkitem2 = .@checkitem2+1;
+			}
+			.@checkitem2 = .@checkitem2-1;
+			if (.@checkitem == .@checkitem2) {
+				Zeny = Zeny-.@totalcost;
+				while (.@checkitem) {
+					repair(.@checkitem);
+					.@checkitem = .@checkitem-1;
+				}
+				mes "[ "+ .@npc_name$ +" ]";
+				mes "^009900¡Listo!^000000";
+				mes "Esta vez intenta ser algo mas ^FF6133cuidadoso^000000.";
+				close;
+			}
+		case 2:
+			mes "[ "+ .@npc_name$ +" ]";
+			mes "Bueno... ^FF6133vuelve^000000 cuando quieras ^^";
+			close;
+		}
+	case 2:
+		mes "[ "+ .@npc_name$ +" ]";
+		mes "Bueno, ^FF6133vuelve^000000 cuando quieras...";
+		close;
+	}
+OnInit:
+		waitingroom "[ Repair Man ]",0;
+end;
+}
+
+// Duplicates
+//============================================================
+payon,166,109,5	duplicate(Repair Man)	Repair Man#pay	851
+rachel,125,97,6	duplicate(Repair Man)	Repair Man#rac	851

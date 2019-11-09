@@ -1,0 +1,141 @@
+//===== rAthena Script =======================================
+//= Healer
+//===== By: ==================================================
+//= Euphy
+//===== Current Version: =====================================
+//= 1.1
+//===== Compatible With: =====================================
+//= rAthena Project
+//===== Description: =========================================
+//= Basic healer script.
+//===== Additional Comments: =================================
+//= 1.0 Initial script.
+//= 1.1 Aligned coordinates with @go.
+//============================================================
+
+-	script	Healer::Healer	-1,{
+
+	.@Price = 0;	// Zeny required for heal
+	.@Buffs = 1;	// Also buff players? (1: yes / 0: no)
+	.@Delay = 0;	// Heal delay, in seconds
+	
+	.@time = gettimetick(2); 
+	
+	if ( .@time > #HATime ) #HATime = false;
+
+	if (@HD > gettimetick(2))
+		end;
+	if (.@Price) {
+		message strcharinfo(0), "Healing costs " + callfunc("F_InsertComma",.@Price) + " Zeny.";
+		if (Zeny < .@Price)
+			end;
+		if (select("^0055FFHeal^000000:^777777Cancel^000000") == 2)
+			end;
+		Zeny -= .@Price;
+	}
+	specialeffect2 EF_HEAL2;
+	percentheal 100,100;
+	if (.@Buffs) {
+		.@bufftime = 240000;
+		if ( #HATime ) {
+			.@bufftime += 240000 * 2;
+			specialeffect2 EF_MAGNIFICAT;
+			sc_start SC_MAGNIFICAT,60000*3,5;
+		}
+		specialeffect2 EF_INCAGILITY;
+		sc_start SC_INCREASEAGI,.@bufftime,10;
+		specialeffect2 EF_BLESSING;
+		sc_start SC_BLESSING,.@bufftime,10;
+	}
+	if (.@Delay)
+		@HD = gettimetick(2) + .@Delay;
+	end;
+	
+OnInit:
+		waitingroom "[ Healer / Buffer ]",0;
+end;
+		
+	
+}
+
+prontera,164,143,3	script	Healer Assistant	696,{
+	.@name$ = "[ ^00BFFF^00BFFFAsistente Healer^000000^000000 ]";
+
+	.@time = gettimetick(2); 
+	.@price1d = 1500000;
+	.@price10d = 10000000;
+		
+	mes .@name$;
+	if (!#HATime) 	
+		mes "Puedo decirle a mi amiga ^800080Healer^000000 que te de una ^FF8C00ayuda^000000 extra.";
+	else
+	{
+	if ( .@time < #HATime ) {
+		mes "^009900Tienes una renta de Buff activa hasta el dia:^000000 "+gettimestr("%Y-%m-%d %H:%M:%S",21,#HATime)+".";
+		mes " ";
+		mes "Se te aumentó la duración del ^FF8C00Agi^000000 y ^FF8C00Bless^000000 de ^1E90FF[4]^000000 a ^1E90FF[12]^000000 minutos y de manera adicional se te da ^800080Magnificant Lv 5^000000 durante ^1E90FF[3]^000000 minutos.";
+		close;
+	} else #HATime = false;
+	}
+	switch(select("~ ^009900Contratar^000000:~ ^1E90FFInformación^000000:~ ^FF0000No^000000, gracias!")){
+		case 1:				
+				
+				switch(select("~ 1 Dia por "+(F_InsertComma(.@price1d))+" Zeny.","~ 7 Dias por "+(F_InsertComma(.@price10d))+" Zeny.","~ Soy pobre.")) {
+					case 1:
+						if ( Zeny < .@price1d ) goto NotEnufZeny;
+						mes "^009900Listo... ¡Disfruta de mis servicios^000000";
+						Zeny -= .@price1d;
+						#HATime = gettimetick(2) + (60 * 60 * 24); // 24 hrs
+						
+					break;
+		
+					case 2:
+						if ( Zeny < .@price10d ) goto NotEnufZeny;
+						mes "^009900Listo... ¡Disfruta de mis servicios^000000";
+							Zeny -= .@price10d;
+						#HATime = gettimetick(2) + (60 * 60 * 24 * 7); // 7 days
+						
+					break;
+					
+				}
+				
+		close;
+		
+		case 2:
+		next;
+		mes .@name$;
+		mes "Actualmente el ^800080Healer^000000 te da ^FF8C00Agi^000000 y ^FF8C00Bless^000000 gratis ^1E90FFdurante 4 minutos^000000, si me ^009900contratas^000000 puedo decirle que te extienda tal beneficio.";
+		next;
+		mes .@name$;
+		mes "1 día: ^1E90FF1,000,000 Zeny^000000.";
+		mes "7 días: ^1E90FF10,000,000 Zeny^000000.";
+		mes "Con estos costos puedo hacer que se te extienda el ^FF8C00Agi^000000 y ^FF8C00Bless^000000 de ^1E90FF[4]^000000 a ^1E90FF[12]^000000 minutos para que puedas hacer tus cosas más tranquilamente ^^.";		
+		next;
+		mes .@name$;
+		mes "De manera adicional, te dará durante ^1E90FF[3]^000000 minutos, ^800080Magnificant^000000.";
+		close;
+		
+		case 3:
+		close;
+	}
+	mes .@name$;
+	
+NotEnufZeny:
+	mes "";
+	mes "~ ^FF0000Lo siento, no tienes Zeny suficiente para contratar mis servicios.^000000";
+	close;
+	
+	Oninit:
+		waitingroom "[ Asistente Healer ]",0;
+	end;
+}
+
+
+// Duplicates
+//============================================================
+payon,176,109,4	duplicate(Healer)	Healer#pay	646
+prontera,152,185,4	duplicate(Healer)	Healer#prt	646
+rachel,125,115,6	duplicate(Healer)	Healer#rac	646
+
+
+

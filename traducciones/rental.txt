@@ -1,0 +1,105 @@
+//===== rAthena Script =======================================
+//= Universal Rental NPC
+//===== By: ==================================================
+//= Euphy
+//===== Current Version: =====================================
+//= 1.0a
+//===== Compatible With: =====================================
+//= rAthena Project
+//===== Description: =========================================
+//= One-click automatic mount rentals.
+//============================================================
+
+prontera,132,190,7	script	Universal Rental	726,{
+	mes "[ ^2e9c99Universal Rental^000000 ]";
+	mes "°Hola!";
+	mes "Conmigo puedes conseguir un carro, un halcÛn o un peco, dependiendo del job que seas y de si cumples con los requisitos que esto conlleva.";
+	next;
+	mes "[ ^2e9c99Universal Rental^000000 ]";
+	mes "øQuÈ deseas hacer?";
+	next;
+	menu "~ Rentar peco, halcÛn o carro.", M1, "~ ^009900Rentar carros premium^000000.", M2;
+	
+M1: if (ismounting()) {
+		dispbottom "#IRO: Debes bajarte de tu montura para poder usar este servicio.", 0xffff00;
+		end;
+	} else if (((eaclass()&EAJ_THIRDMASK)==EAJ_RANGER) && !countitem(6124)) {
+		if (!checkfalcon() && getskilllv("HT_FALCON") && !checkwug()) {
+			if(select(" ~ Falcon: ~ Warg")==1) setfalcon;
+			else getitem 6124,1; //Wolf's_Flute
+		} else getitem 6124,1; //Wolf's_Flute
+	} else if (((eaclass()&EAJ_THIRDMASK)==EAJ_MECHANIC) && !checkcart() && getskilllv("MC_PUSHCART")) {
+		if (!checkmadogear() && getskilllv("NC_MADOLICENCE")) {
+			if(select(" ~ Cart: ~ Mado")==1) setcart;
+			else setmadogear;
+		} else setcart;
+	} else if (!checkcart() && getskilllv("MC_PUSHCART")) setcart;
+	else if (!checkfalcon() && getskilllv("HT_FALCON") && !checkwug()) setfalcon;
+	else if (!checkriding() && !checkdragon() && getskilllv("KN_RIDING")) {
+		if ((eaclass()&EAJ_THIRDMASK)==EAJ_RUNE_KNIGHT) setdragon;
+		else setriding;
+	} else if (!checkmadogear() && getskilllv("NC_MADOLICENCE")) setmadogear;
+	else {
+		dispbottom "#IRO: No cumples con los requisitos para poder usar este servicio.", 0xffff00;
+		end;
+	}
+	specialeffect2 EF_TEIHIT3;
+	end;
+	
+
+M2: 	mes "[ ^2e9c99Universal Rental^000000 ]";
+	mes "Los ^800080carros premium^000000 son 7 diseÒos nuevos de carros para la clase Merchant.";
+	next;
+	mes "[ ^2e9c99Universal Rental^000000 ]";
+	mes "El costo para desbloquear en tu cuenta el uso libre de todos los ^800080carros premium^000000 es de 20,000 ^FF6133Cash points^000000.";
+	next;
+	switch(select("~ ^777777Ver diseÒos^000000.", (!#MCDECOR2PAID) ? "~ ^009900Desbloquear carros premium^000000.":"", (#MCDECOR2PAID) ? "~ ^1E90FFSkill Change Cart 2^000000.":"")) {
+	case 1:
+		// The picture is read from data\texture\√¨≈ì¬†√¨¬†‚Ç¨√¨¬ù¬∏√≠‚Äû¬∞√≠≈ΩÀú√¨¬ù¬¥√¨≈†¬§\illust
+		// cutin file name (must be *.bmp)
+		cutin "carts_new",4;
+		mes "[ ^2e9c99Universal Rental^000000 ]";
+		mes "Estos son los ^800080carros premium^000000.";
+		close2;
+		cutin "",255;
+		break;
+		
+	case 2:
+       	 	if ( !#MCDECOR2PAID ) {
+		mes "[ ^2e9c99Universal Rental^000000 ]";
+        	mes "NecesitarÈ que me entregues 20,000 ^FF6133Cash points^000000 para desbloquear el uso libre de todos los ^800080carros premium^000000 en tu cuenta.";
+         	mes "Estado actual: "+ #CASHPOINTS + " ^FF6133Cash points^000000.";
+		mes "øLos tienes preparados?";
+        	next;
+        	if (select("~ ^009900Entregar Cash points^000000.:~ ^FF0000No, a˙n no^000000.")==2)close;
+           	   if ( #CASHPOINTS < 20000 ) {
+			mes "[ ^00BFFFUniversal Rental^000000^000000 ]";
+			mes "~ ^FF0000No tienes lo que necesito para poder disfrutar de mi servicio^000000.";
+                	close;
+            	}
+       	 }
+		mes "[ ^2e9c99Universal Rental^000000 ]";
+		mes "^009900°Listo!^000000";
+		mes "Presiona (Alt + S) y se abrir· tu arbol de habilidades, en este, encontrar·s una Skill llamada *^1E90FFChange Cart 2^000000* con la que podr·s elegir todos los ^800080carros premium^000000.";
+		next;
+		mes "[ ^2e9c99Universal Rental^000000 ]";
+		mes "Recuerda, ahora todos los personajes de esta cuenta que sean de la clase Merchant, hablando conmigo, podr·n disfrutar de este servicio sin necesidad de pagar nada m·s.";
+        	close2;
+        	skill 2544,1,SKILL_PERM_GRANT;
+        	#CASHPOINTS -= 20000;
+        	#MCDECOR2PAID = true;
+       	 	break;	
+	case 3:
+		mes "[ ^2e9c99Universal Rental^000000 ]";
+		mes "^009900°Listo!^000000";
+		mes "Presiona (Alt + S) y se abrir· tu arbol de habilidades, en este, encontrar·s una skill llamada *^1E90FFChange Cart 2^000000* con la que podr·s elegir todos los ^800080carros premium^000000.";
+		close2;
+		skill 2544,1,SKILL_PERM_GRANT;
+		break;
+	}
+	end;
+OnInit:
+		waitingroom "[ Universal Rental ]",0;
+end;
+
+}
