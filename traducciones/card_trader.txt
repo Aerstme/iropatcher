@@ -12,23 +12,23 @@
  
 prtbar,44,24,3	script	Card Recycler	402,{
 	mes "[ ^2e9c99Card Recycler^000000 ]";
-	mes "¡Hola!";
-	mes "Conmigo puedes conseguir 1 ^800080punto^000000 por cada ^1E90FFcarta^000000 de monstruo normal que me vendas, cuando consigas 10 ^800080puntos^000000 podrás comprar 1x ^FF6133Old Card Album^000000.";
+	mes "Hi!";
+	mes "With me you can get 1 ^800080point^000000 witch each ^1E90FFcard^000000 of a normal monster you sell to me, when you get 10 ^800080points^000000 you can buy an 1x^FF6133Old Card Album^000000.";
 	next;
 	mes "[ ^00BFFFCard Recycler^000000 ]";
-	mes "~ ^FF0000Nota: Están bloqueadas el 99,7% de las cartas MVP y Miniboss, pero eso no quita que debas tener mucho cuidado a la hora de vender tus cartas^000000.";
+	mes "~ ^FF0000Note: 99.7% of MVP and Miniboss cards are blocked, but that doesn't mean you should be very careful when selling your cards^000000.";
 	next;
-	switch(select("~ Vender cartas.:~ Tienda (^0055FF"+getd(.Points$)+"^000000 puntos).:Salir.")) {
+	switch(select("~ Sell Cards:~ Shop (^0055FF"+getd(.Points$)+"^000000 puntos).:Exit")) {
 	
 	case 1:
 		mes "[ ^2e9c99Card Recycler^000000 ]";
-		mes "Selecciona solamente las ^1E90FFcartas^000000 que quieras vender por ^800080puntos^000000.";
+		mes "Select only the ^1E90FFcards^000000 you want to sell for ^800080points^000000.";
 		if (.Level) {
 			mes "[ ^00BFFFCard Recycler^000000 ]";
 			mes " ";
-			mes "Deben ser cartas dropeadas";
-			mes "por monstruos de nivel";
-			mes .Level+" en adelante.";
+			mes "Must be dropped cards";
+			mes "by monsters from level";
+			mes .Level+" onwards.";
 		}
 		deletearray @sold_nameid[0],getarraysize(@sold_nameid);
 		callshop "card_shop_trade",2;
@@ -36,13 +36,13 @@ prtbar,44,24,3	script	Card Recycler	402,{
 		end;
 	case 2:
 		mes "[ ^2e9c99Card Recycler^000000 ]";
-		mes "Tienes ^0055FF"+getd(.Points$)+"^000000 ^800080puntos^000000"+((getd(.Points$) == 1)?".":".");
+		mes "You ^0055FF"+getd(.Points$)+"^000000 ^800080have^000000"+((getd(.Points$) == 1)?".":".");
 		callshop "card_shop_trade",1;
 		npcshopattach "card_shop_trade";
 		end;
 	case 3:
 		mes "[ ^2e9c99Card Recycler^000000 ]";
-		mes "¡Seguro que nos volvemos a ver!";
+		mes "Â¡Seguro que nos volvemos a ver!";
 		emotion ET_SLEEPY;
 		close;		
 	}
@@ -90,7 +90,7 @@ OnSellItem:
 		delitem .@card_id[.@i],.@card_amt[.@i];
 	setd .Points$, getd(.Points$)+.@card_total;
 	mes "[ ^2e9c99Card Recycler^000000 ]";
-	mes "^009900¡Listo!^000000";
+	mes "^009900Â¡Listo!^000000";
 	emotion ET_DELIGHT;
 	close;
  
