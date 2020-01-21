@@ -107,8 +107,8 @@ prontera,164,143,3	script	Healer Assistant	696,{
 		mes "Actually the ^800080Healer^000000 gives you ^FF8C00Agi^000000 and ^FF8C00Blessing^000000 for free for ^1E90FF4 minutes^000000, if you ^009900hire me^000000, I can tell my friend to extend the buff duration.";
 		next;
 		mes .@name$;
-		mes "1 día: ^1E90FF1,000,000 Zeny^000000.";
-		mes "7 días: ^1E90FF10,000,000 Zeny^000000.";
+		mes "1 day: ^1E90FF1,000,000 Zeny^000000.";
+		mes "7 days: ^1E90FF10,000,000 Zeny^000000.";
 		mes "With that amount of zeny I can extend for you ^FF8C00Agi^000000 and ^FF8C00Blessing^000000 duration from ^1E90FF[4]^000000 to ^1E90FF[12]^000000 minutes.";		
 		next;
 		mes .@name$;
