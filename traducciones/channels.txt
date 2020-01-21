@@ -1,0 +1,204 @@
+-	script	Channels	-1,{
+	OnInit:
+		bindatcmd "channels",strnpcinfo(0)+"::OnChannel";
+		setarray .channels_list_name$, "#main", "#trade", "#support", "#spam";// "#english", "#portuguese","#tagalog", "#french", "#deutsch";
+		setarray .channels_list$[0], "#main", "#trade", "#support", "#spam"; //"#english", "#portuguese","#tagalog", "#french", "#deutsch";
+		.channel_size = getarraysize(.channels_list$);		
+		end;
+		
+	OnChannel:
+		    mes "[ ^FF1493Canales de Texto^000000 ]";
+			mes "Maneja diferentes canales dependiendo de las necesidades que tengas.";
+			mes "Puedes cambiar esta configuracion cuando quieras utilizando el comando: ^FF1493@channels^000000";
+						//mes "LIKE -> <URL>Facebook page<INFO>http://www.facebook.com/TirionRO/,300,300</INFO></URL> ";
+
+		do{
+		.@menu$ = "";
+        for (.@i = 0; .@i < .channel_size; .@i++)
+            .@menu$ = .@menu$ + .channels_list_name$[.@i] + (#CHANNEL_SETTINGS & (1 << .@i) ? " => [^27C027ON^000000]" : " => [^ff0000OFF^000000]")  + ":";
+			
+        .@i = select(.@menu$) -1 ;
+		
+		switch(.@i){
+		
+		case 0:
+			if (#CHANNEL_SETTINGS & (1 << .@i)) {
+				#CHANNEL_SETTINGS -= (1 << .@i);
+				next;
+
+				channel_kick("#main",strcharinfo(0));
+				dispbottom ("#TRO: Si quieres volver a leer los mensajes de este canal, activalo por @channels o whispea directamente al canal #main y entraras automaticamente.",0x00FA9A,getcharid(0));
+
+				}else{
+					#CHANNEL_SETTINGS |= (1 << .@i);
+										next;
+
+					atcommand "@join #main";
+					dispbottom ("#TRO: Whispea a #main y escribe un mensaje para mandarlo al canal, si quieres dejar de leer los mensajes de este canal, desactivalo por @channels.",0xFFFF00,getcharid(0));
+
+				}
+			
+		break;
+		case 1:
+			if (#CHANNEL_SETTINGS & (1 << .@i)) {
+				#CHANNEL_SETTINGS -= (1 << .@i);
+									next;
+
+				channel_kick("#trade",strcharinfo(0));
+				dispbottom ("#TRO: Si quieres volver a leer los mensajes de este canal, activalo por @channels o whispea directamente al canal #trade y entraras automaticamente.",0x00FA9A,getcharid(0));
+
+				}else{
+					#CHANNEL_SETTINGS |= (1 << .@i);
+										next;
+
+					atcommand "@join #trade";
+					dispbottom ("#TRO: Whispea a #trade y escribe un mensaje para mandarlo al canal, si quieres dejar de leer los mensajes de este canal, desactivalo por @channels.",0xFFFF00,getcharid(0));
+
+				}
+			break;
+		
+		case 2:
+			if (#CHANNEL_SETTINGS & (1 << .@i)) {
+				#CHANNEL_SETTINGS -= (1 << .@i);
+									next;
+
+				channel_kick("#support",strcharinfo(0));
+				dispbottom ("#TRO: Si quieres volver a leer los mensajes de este canal, activalo por @channels o whispea directamente al canal #support y entraras automaticamente.",0x00FA9A,getcharid(0));
+
+				}else{
+					#CHANNEL_SETTINGS |= (1 << .@i);
+					next;
+					atcommand "@join #support";
+					dispbottom ("#TRO: Whispea a #support y escribe un mensaje para mandarlo al canal, si quieres dejar de leer los mensajes de este canal, desactivalo por @channels.",0xFFFF00,getcharid(0));
+
+				}
+			break;
+		
+		case 3:
+			if (#CHANNEL_SETTINGS & (1 << .@i)) {
+				#CHANNEL_SETTINGS -= (1 << .@i);
+									next;
+
+				channel_kick("#spam",strcharinfo(0));
+				dispbottom ("#TRO: Si quieres volver a leer los mensajes de este canal, activalo por @channels o whispea directamente al canal #spam y entraras automaticamente.",0x00FA9A,getcharid(0));
+
+				}else{
+					#CHANNEL_SETTINGS |= (1 << .@i);
+										next;
+
+					atcommand "@join #spam";
+					dispbottom ("#TRO: Whispea a #spam y escribe un mensaje para mandarlo al canal, si quieres dejar de leer los mensajes de este canal, desactivalo por @channels.",0xFFFF00,getcharid(0));
+
+				}
+			break;
+		
+		/*case 4:
+			if (#CHANNEL_SETTINGS & (1 << .@i)) {
+				#CHANNEL_SETTINGS -= (1 << .@i);
+									next;
+
+				channel_kick("#english",strcharinfo(0));
+				dispbottom ("#TRO: Si quieres volver a leer los mensajes de este canal, activalo por @channels o whispea directamente al canal #english y entraras automaticamente.",0x00FA9A,getcharid(0));
+
+				}else{
+					#CHANNEL_SETTINGS |= (1 << .@i);
+										next;
+
+					atcommand "@join #english";
+					dispbottom ("#TRO: Whispea a #english y escribe un mensaje para mandarlo al canal, si quieres dejar de leer los mensajes de este canal, desactivalo por @channels.",0xFFFF00,getcharid(0));
+
+				}
+			break;
+		
+		case 5:
+			if (#CHANNEL_SETTINGS & (1 << .@i)) {
+				#CHANNEL_SETTINGS -= (1 << .@i);
+									next;
+
+				channel_kick("#portuguese",strcharinfo(0));
+				dispbottom ("#TRO: Si quieres volver a leer los mensajes de este canal, activalo por @channels o whispea directamente al canal #portuguese y entraras automaticamente.",0x00FA9A,getcharid(0));
+
+				}else{
+					#CHANNEL_SETTINGS |= (1 << .@i);
+										next;
+
+					atcommand "@join #portuguese";
+					dispbottom ("#TRO: Whispea a #portuguese y escribe un mensaje para mandarlo al canal, si quieres dejar de leer los mensajes de este canal, desactivalo por @channels.",0xFFFF00,getcharid(0));
+
+				}
+			break;
+		
+		case 6:
+			if (#CHANNEL_SETTINGS & (1 << .@i)) {
+				#CHANNEL_SETTINGS -= (1 << .@i);
+									next;
+
+				channel_kick("#tagalog",strcharinfo(0));
+				dispbottom ("#TRO: Si quieres volver a leer los mensajes de este canal, activalo por @channels o whispea directamente al canal #tagalog y entraras automaticamente.",0x00FA9A,getcharid(0));
+
+				}else{
+					#CHANNEL_SETTINGS |= (1 << .@i);
+										next;
+
+					atcommand "@join #tagalog";
+					dispbottom ("#TRO: Whispea a #tagalog y escribe un mensaje para mandarlo al canal, si quieres dejar de leer los mensajes de este canal, desactivalo por @channels.",0xFFFF00,getcharid(0));
+
+				}
+				break;
+				
+		case 7:
+			if (#CHANNEL_SETTINGS & (1 << .@i)) {
+				#CHANNEL_SETTINGS -= (1 << .@i);
+									next;
+
+				channel_kick("#french",strcharinfo(0));
+				dispbottom ("#TRO: Si quieres volver a leer los mensajes de este canal, activalo por @channels o whispea directamente al canal #french y entraras automaticamente.",0x00FA9A,getcharid(0));
+
+				}else{
+					#CHANNEL_SETTINGS |= (1 << .@i);
+										next;
+
+					atcommand "@join #french";
+					dispbottom ("#TRO: Whispea a #french y escribe un mensaje para mandarlo al canal, si quieres dejar de leer los mensajes de este canal, desactivalo por @channels.",0xFFFF00,getcharid(0));
+
+				}
+				break;
+		
+		case 8:
+			if (#CHANNEL_SETTINGS & (1 << .@i)) {
+				#CHANNEL_SETTINGS -= (1 << .@i);
+									next;
+
+				channel_kick("#deutsch",strcharinfo(0));
+				dispbottom ("#TRO: Si quieres volver a leer los mensajes de este canal, activalo por @channels o whispea directamente al canal #deutsch y entraras automaticamente.",0x00FA9A,getcharid(0));
+
+				}else{
+					#CHANNEL_SETTINGS |= (1 << .@i);
+										next;
+
+					atcommand "@join #deutsch";
+					dispbottom ("#TRO: Whispea a #deutsch y escribe un mensaje para mandarlo al canal, si quieres dejar de leer los mensajes de este canal, desactivalo por @channels.",0xFFFF00,getcharid(0));
+
+				}
+				break;
+		*/
+		case 4:
+			close;
+			}
+		
+		} while(.@i != 5);
+		mes "Bye";
+        close;
+   
+    OnPCLoginEvent:
+		#CHANNEL_SETTINGS = 0;
+        // sleep2 1000;
+        while (.@i < .channel_size) {
+            if (#CHANNEL_SETTINGS & (1 >> .@i))
+				atcommand "@channel leave "+.channels_list$[.@i];
+            .@i++;
+        }
+        end;
+ 
+}
+	

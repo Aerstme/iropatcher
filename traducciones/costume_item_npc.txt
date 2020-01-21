@@ -1,0 +1,113 @@
+// -------------------------------------------------------------------------------
+// 	Script Name : Headgear to Costume converter >> Costume to Headgear converter
+// -------------------------------------------------------------------------------
+// Description :
+// - Allows a user to convert the equipped headgear (on Top, Mid or Low) into a
+//   costume item. It will remove any card and refine of the Item.
+// - Allows a user to restore the equipped costume headgear (on Top, Mid or Low)
+//    into its original form. It will not return any card or refine of the item.
+// -------------------------------------------------------------------------------
+-	script	Costume Clown	-1,{
+	disable_items;
+	mes "[ ^2e9c99Costume Clown^000000 ]";
+	mes "¡Hola!";
+	mes "Conmigo puedes ^800080convertir^000000 tus headgears en costume's o ^FF6133restaurarlos^000000 a su forma original.";
+	mes "Debes tener el item equipado.";
+	next;
+	switch(select("~ ^009900Convertir en costume^000000.:~ ^1E90FFRestaurar costume^000000.:~ ^FF0000No, gracias^000000.")) {
+	case 1:
+			mes "[ ^2e9c99Costume Clown^000000 ]";
+			mes "Por favor, selecciona el item que quieras ^800080convertir^000000.";
+			mes "~ ^FF0000Nota: Perderás el refinamiento y las cartas de los items que quieras convertir en costume, ten mucho cuidado^000000.";
+			next;
+				setarray .@Position$[1],"Top","Mid","Low";
+				setarray .@Position[1], EQI_HEAD_TOP, EQI_HEAD_MID, EQI_HEAD_LOW;
+				set .@Menu$,"";
+			for( set .@i, 1; .@i < 5; set .@i, .@i + 1 )
+			{
+				if( getequipisequiped(.@Position[.@i]) )
+				set .@Menu$, .@Menu$ + .@Position$[.@i] + " - " + "[" + getequipname(.@Position[.@i]) + "]";
+				set .@Menu$, .@Menu$ + ":";
+			}
+			set .@Part, .@Position[ select(.@Menu$) ];
+			if( !getequipisequiped(.@Part) )
+			{
+				mes "[ ^2e9c99Costume Clown^000000 ]";
+				mes "~ ^FF0000No tienes equipado ningún item^000000.";
+				close;
+			}
+			mes "[ ^2e9c99Costume Clown^000000 ]";
+			mes "¿Quieres ^800080convertir^000000 en costume tu " + getitemname(getequipid(.@Part)) + "?";
+			next;
+			if( select("~ ^009900Si, por favor^000000.:~ ^FF0000No, gracias^000000.") == 2 )
+			{
+				mes "[ ^2e9c99Costume Clown^000000 ]";
+				mes "Necesitas algo de tiempo para pensarlo, ¿eh?";
+				mes "Está bien, es entendible.";
+				close;
+			}
+			costume .@Part; // Convert the Headgear
+			mes "[ ^2e9c99Costume Clown^000000 ]";
+			mes "^009900¡Listo!^000000";
+			close;
+	case 2:
+			next;
+			mes "[ ^2e9c99Costume Clown^000000 ]";
+			mes "Por favor, selecciona el item que quieras ^FF6133restaurar^000000.";
+			mes "~ ^FF0000Nota: Restauraré el item sin refinamiento o cartas^000000.";
+			next;
+				setarray .@Position$[1],"Top","Mid","Low";
+				setarray .@Position[1],     EQI_COSTUME_HEAD_TOP,    EQI_COSTUME_HEAD_MID,   EQI_COSTUME_HEAD_LOW;
+				set .@Menu$,"";
+			for( set .@i, 1; .@i < 5; set .@i, .@i + 1 )
+			{
+				if( getequipisequiped(.@Position[.@i]) )
+				set .@Menu$, .@Menu$ + .@Position$[.@i] + " - " + "[" + getequipname(.@Position[.@i]) + "]";
+				set .@Menu$, .@Menu$ + ":";
+			}
+			set .@Part, .@Position[ select(.@Menu$) ];
+			if( !getequipisequiped(.@Part) )
+			{
+				mes "[ ^2e9c99Costume Clown^000000 ]";
+				mes "~ ^FF0000No tienes equipado ningún item^000000.";
+				close;
+			}
+			if ( getequipid(.@Part) >= 19500 && getequipid(.@Part) <= 20499 ) {
+				mes "[ ^2e9c99Costume Clown^000000 ]"; 
+				mes "~ ^FF0000Solo puedes restaurar los items que previamente hayan sido convertidos por mi^000000.";
+				close;
+			}
+			mes "[ ^2e9c99Costume Clown^000000 ]";
+			mes "¿Quieres ^FF6133restaurar^000000 tu Costume's " + getitemname(getequipid(.@Part)) + "?";
+			next;
+			if( select("~ ^009900Si, por favor^000000.:~ ^FF0000No, gracias^000000.") == 2 )
+			{
+				mes "[ ^2e9c99Costume Clown^000000 ]";
+				mes "Necesitas algo de tiempo para pensarlo, ¿eh?";
+				mes "Está bien, es entendible.";
+				close;
+			}
+			a = getequipid(.@Part);			
+			delitem a,1;
+			getitem a,1;
+			
+			mes "[ ^2e9c99Costume Clown^000000 ]";
+			mes "^009900¡Listo!^000000";
+			close;
+	case 3:
+		mes "[ ^2e9c99Costume Clown^000000 ]";
+		mes "Bueno, regresa cuando necesites de mis servicios.";
+		close;
+	}
+
+OnInit:
+		waitingroom "[ Costume Clown ]",0;
+end;
+
+}
+// --------------------------------------------------------------------------
+// Use duplicates to put your npc on different cities
+// --------------------------------------------------------------------------
+
+prtbar,19,16,7	duplicate(Costume Clown)	Costume Clown#prt	715
+

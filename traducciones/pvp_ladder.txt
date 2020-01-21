@@ -1,0 +1,100 @@
+// by pajodex
+-	script	pvp_streak_system	-1,{
+OnInit:
+	// enable gepard check?
+	// set to true to enable
+	.gepard = false;
+
+	// if same player is killed x times.
+	// anti-feed streak is activated.
+	.antifeedstreak = 3;
+	end;
+	
+OnPCLoginEvent:
+	if ( .gepard ) @unique_id$ = get_unique_id();
+	end;
+	
+OnPCKillEvent:
+	.@map$ = strcharinfo(3);
+	
+	if ( getmapflag(.@map$,mf_town) ) end;
+	
+	//.@killedcid = convertpcinfo(killedrid,CPC_CHAR);
+	.@killedname$ = rid2name(killedrid);
+	.@killername$ = strcharinfo(0);
+	.@killedcid = getcharid(0,.@killedname$);
+	.@killedstreak = getvar(@streak_kill, .@killedcid);
+	.@unique_id$ = getvar(@unique_id$, .@killedcid);
+	
+	if ( .gepard && .@unique_id$ == @unique_id$ ) {
+		dispbottom "[System] : it seems that you are killing your alt character. Your stats will be reset.";
+		@lastkilledstreak = @lastkilled = @streak_kill = false;
+		end;
+	
+	}
+	
+	@streak_kill++;
+	
+	if ( @lastkilled == killedrid ) @lastkilledstreak++;
+	else @lastkilled = killedrid;
+	
+	// Activate antifeed system
+	if ( @lastkilledstreak == .antifeedstreak )  {
+		@lastkilledstreak = @lastkilled = @streak_kill = false;
+		announce "[ "+ .@killername$+" ] and [ "+ .@killedname$ +" ] has triggered anti-feed streak system at "+ .@map$, bc_all;
+		dispbottom "Your kill streak has been reset.";
+		end;
+	}
+	
+	// Streak bounty
+	switch(@streak_kill) {
+	case 5: 
+		getitem 512, 1; // get apple
+		break;
+	case 10: 
+		getitem 515, 1; // get carrot
+		break;
+	case 15: 
+		getitem 608, 1; // get yggdrasil seed
+		break;
+	default: 
+		.@a = true; 
+		break;
+	}
+	
+	if ( !.@a ) {
+		sleep2 1000;
+		announce "[ "+ .@killername$+" ] got "+ @streak_kill +" killing streak at "+ .@map$, bc_all;
+		if ( @streak_kill == 15 ) @streak_kill = false; // reset streak to zero
+	}
+		
+	// Anti-streak bounty ( 10 - 13 kills )
+	if ( .@killedstreak >= 10 && .@killedstreak <= 13 ) {
+		getitem 909, 1; // get jellopy
+		sleep2 1000;
+		announce "[ "+ .@killername$+" ] has ended [ "+ .@killedname$ +" ]'s "+.@killedstreak+" killing streak at "+ .@map$, bc_all;
+	}
+	
+	// Epic bounty 
+	if ( .@killedstreak == 14 ) {
+		getitem 515, 1; // get carrot 
+		
+		setarray .@epic_message$,
+			.@killedname$ +" sucked at maintaining his/her streak.",
+			.@killername$ +" has snatched "+ .@killedname$ +"'s streak",
+			.@killedname$ +" head was just taken off..";
+			
+		.@s = rand(getarraysize(.@epic_message$)-1);
+		sleep2 1000;
+		announce .@epic_message$[.@s], bc_all, 0xff0000, bold, 15;
+	}
+	
+	dispbottom "You killed [ "+.@killedname$+" ]! Current kill streak: "+ @streak_kill;
+	
+	// Killed player is now attached here..
+	attachrid(killedrid);
+	@lastkilledstreak = @lastkilled = @streak_kill = false;
+	@death_count++;
+	dispbottom "You were killed by [ "+rid2name(killerrid)+" ]! Total death: "+ @death_count;
+	end;
+}

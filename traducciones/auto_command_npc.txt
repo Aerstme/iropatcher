@@ -1,0 +1,41 @@
+prontera,145,201,3	script	Command Cat	545,{
+    .@npcname$ = "["+ strnpcinfo(1) +"]";
+    mes .@npcname$;
+    mes "Hello, "+strcharinfo(0);
+    mes "What setting do you want to change?";
+    next;
+    for ( .@i = 0; .@i < .total; .@i++ )
+        .@menu$ = .@menu$ + .atname$[.@i] +" - "+( ( atcommand_login & 1 << .@i )? "^00BB22Activado^000000" : "^FF2200Desactivado^000000" )+":";
+    .@s = select( .@menu$ ) -1;
+    mes .@npcname$;
+    mes "Status: "+( ( atcommand_login & 1 << .@s )? "^00BB22On^000000" : "^FF2200Off^000000");
+    next;
+    mes .@npcname$;
+    if ( select( "I want to "+( ( atcommand_login & 1 << .@s )? "^FF2200disable^000000": "^00BB22enable^000000"  )+" it", "Nothing" ) == 2 ) {
+        mes "See ya.";
+        end;
+    }
+    if ( atcommand_login & 1 << .@s ) {
+        mes .atname$[.@s] +" is now ^FF2200Off^000000.";
+        atcommand "@"+ .atcommand$[.@s] +" off";
+    }
+    else {
+        mes .atname$[.@s] +" is now ^00BB22On^000000.";
+        atcommand "@"+ .atcommand$[.@s] +( ( .@s == 1 )? " on": "" );
+    }
+    atcommand_login = atcommand_login ^ 1 << .@s;
+    end;
+OnPCLoginEvent:
+    if ( !atcommand_login ) end;
+    for ( .@i = 0; .@i < .total; .@i++ ) {
+        if ( atcommand_login & 1 << .@i ) {
+            atcommand "@"+ .atcommand$[.@i] +( ( .@i == 1 )? " on": "" );
+        }
+    }
+    end;
+OnInit:
+    setarray .atname$, "@autoloot", "@showexp", "@listenbg", "@noask";
+    setarray .atcommand$, "autoloot", "showexp", "listenbg", "noask";
+    .total = 4;
+    end;
+}

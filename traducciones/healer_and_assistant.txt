@@ -67,23 +67,23 @@ prontera,164,143,3	script	Healer Assistant	696,{
 		
 	mes .@name$;
 	if (!#HATime) 	
-		mes "I can say to my friend ^800080Healer^000000 give you a ^FF8C00help^000000.";
+		mes "Puedo decirle a mi amiga ^800080Healer^000000 que te de una ^FF8C00ayuda^000000 extra.";
 	else
 	{
 	if ( .@time < #HATime ) {
-		mes "^009900You have an active income buff until the day:^000000 "+gettimestr("%Y-%m-%d %H:%M:%S",21,#HATime)+".";
+		mes "^009900Tienes una renta de Buff activa hasta el dia:^000000 "+gettimestr("%Y-%m-%d %H:%M:%S",21,#HATime)+".";
 		mes " ";
-		mes "You got duration increase of ^FF8C00Agi^000000 and ^FF8C00Bless^000000 of ^1E90FF[4]^000000 to ^1E90FF[12]^000000 minutes, also you get ^800080Magnificant Lv 5^000000 for ^1E90FF[3]^000000 minutes.";
+		mes "Se te aumentó la duración del ^FF8C00Agi^000000 y ^FF8C00Bless^000000 de ^1E90FF[4]^000000 a ^1E90FF[12]^000000 minutos y de manera adicional se te da ^800080Magnificant Lv 5^000000 durante ^1E90FF[3]^000000 minutos.";
 		close;
 	} else #HATime = false;
 	}
-	switch(select("~ ^009900Take on^000000:~ ^1E90FFInformation^000000:~ ^FF0000No^000000, Thank You!")){
+	switch(select("~ ^009900Contratar^000000:~ ^1E90FFInformación^000000:~ ^FF0000No^000000, gracias!")){
 		case 1:				
 				
-				switch(select("~ 1 Day for "+(F_InsertComma(.@price1d))+" Zeny.","~ 7 Days for "+(F_InsertComma(.@price10d))+" Zeny.","~ I'm poor.")) {
+				switch(select("~ 1 Dia por "+(F_InsertComma(.@price1d))+" Zeny.","~ 7 Dias por "+(F_InsertComma(.@price10d))+" Zeny.","~ Soy pobre.")) {
 					case 1:
 						if ( Zeny < .@price1d ) goto NotEnufZeny;
-						mes "^009900It's Ready... Enjoy your buffs!^000000";
+						mes "^009900Listo... ¡Disfruta de mis servicios^000000";
 						Zeny -= .@price1d;
 						#HATime = gettimetick(2) + (60 * 60 * 24); // 24 hrs
 						
@@ -91,7 +91,7 @@ prontera,164,143,3	script	Healer Assistant	696,{
 		
 					case 2:
 						if ( Zeny < .@price10d ) goto NotEnufZeny;
-						mes "^009900It's Ready... Enjoy your buffs!^000000";
+						mes "^009900Listo... ¡Disfruta de mis servicios^000000";
 							Zeny -= .@price10d;
 						#HATime = gettimetick(2) + (60 * 60 * 24 * 7); // 7 days
 						
@@ -104,15 +104,15 @@ prontera,164,143,3	script	Healer Assistant	696,{
 		case 2:
 		next;
 		mes .@name$;
-		mes "Actually the ^800080Healer^000000 gives to you free ^FF8C00Agi^000000 and ^FF8C00Bless^000000 ^1E90FFfor 4 minutes^000000, if you ^009900hire me^000000 i can tell to her to extend such a benefit.";
+		mes "Actualmente el ^800080Healer^000000 te da ^FF8C00Agi^000000 y ^FF8C00Bless^000000 gratis ^1E90FFdurante 4 minutos^000000, si me ^009900contratas^000000 puedo decirle que te extienda tal beneficio.";
 		next;
 		mes .@name$;
-		mes "1 day: ^1E90FF1,000,000 Zeny^000000.";
-		mes "7 days: ^1E90FF10,000,000 Zeny^000000.";
-		mes "With these cost i can make you extend the ^FF8C00Agi^000000 and ^FF8C00Bless^000000 of ^1E90FF[4]^000000 to ^1E90FF[12]^000000 minutes for you can to do your works! ^^.";		
+		mes "1 día: ^1E90FF1,000,000 Zeny^000000.";
+		mes "7 días: ^1E90FF10,000,000 Zeny^000000.";
+		mes "Con estos costos puedo hacer que se te extienda el ^FF8C00Agi^000000 y ^FF8C00Bless^000000 de ^1E90FF[4]^000000 a ^1E90FF[12]^000000 minutos para que puedas hacer tus cosas más tranquilamente ^^.";		
 		next;
 		mes .@name$;
-		mes "Additionally, it gives to you ^1E90FF[3]^000000 minutes, ^800080Magnificant^000000.";
+		mes "De manera adicional, te dará durante ^1E90FF[3]^000000 minutos, ^800080Magnificant^000000.";
 		close;
 		
 		case 3:
@@ -122,7 +122,7 @@ prontera,164,143,3	script	Healer Assistant	696,{
 	
 NotEnufZeny:
 	mes "";
-	mes "~ ^FF0000Sorry, you don't have enough zeny to hire my services.^000000";
+	mes "~ ^FF0000Lo siento, no tienes Zeny suficiente para contratar mis servicios.^000000";
 	close;
 	
 	Oninit:

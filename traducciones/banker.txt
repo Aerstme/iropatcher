@@ -1,0 +1,225 @@
+prontera,183,213,3	script	Banker::Sbanker0	833,{ 
+
+	set .@notcmd, 1;
+	OnBegin:
+	
+	set #oldbankstorage, #oldbankstorage + #bankstorage;
+	set #savings, #savings + #bankstorage;
+	set #bankstorage, 0;
+	function	FailMessage;
+	function	Transaction;
+	
+	// == Configurations =========================================
+	set .@mz, 2147483647;	// Server Max Zeny (Default: 1000000000)
+	set .@n$, "[ ^00BFFFBanquero^000000 ]";	// NPC Name
+	// ===========================================================
+	
+	mes .@n$;
+	if (.@notcmd)
+	mes "Bienvenidos al primer banco de Rune-Midgard. Nuestra oficina principal la tenemos en Prontera pero pronto abriremos nuevas sucursales por todo el mundo.";
+	mes "=> ^FF1493Cuenta Bancaria^000000: " + #savings;
+	.@menu$ = "[ > ] ^7B7F26Retirar^000000 ^FF1493Zeny^000000.:[ > ] ^6E4C10Depositar^000000 ^FF1493Zeny^000000.";
+	.@sel = select(.@menu$) -1;
+	
+	switch(.@sel){
+	case 0:
+	next;
+		switch(select("~ ^7B7F26Retirar^000000 con ^800080limite maximo^000000.", "~ ^7B7F26Retirar^000000 el total de mi ^FF1493Cuenta Bancaria^000000.")){
+			case 1: // Retiro con limite 
+				next;
+				mes .@n$;
+				mes "Con esta opcion podras ^7B7F26retirar^000000 cantidades exactas de ^FF1493Zeny^000000 pero debes saber que ^ff0000NO^000000 podras ^7B7F26retirar^000000 mas de ^A4A81A100 Millones^000000 por movimiento.";
+				mes "Por favor, introduzca la cantidad de ^FF1493Zeny^000000 que desee ^7B7F26retirar^000000.";
+				input .@amt,0,.@mz;
+				
+				if ( .@amt < 1 )
+				{
+					next;
+					mes .@n$;
+					mes "^FF0000Por favor, no me haga perder el tiempo...^000000";
+					close;
+				}
+				
+				if (#savings == 0){
+				next;
+				mes .@n$;
+				mes "^0000FFNo dispone de ^FF0000fondos^000000 ^0000FFsuficientes por el momento^000000."; 
+				close;
+				}
+				
+				
+				if(Zeny == 2147483647 ) {
+				next;
+				mes .@n$;
+				mes "Lo siento, no puedo proceder a ^7B7F26retirar^000000 tu dinero. La maxima cantidad de ^FF1493Zeny^000000 que puedes llegar a tener en tu monedero son ^8000802,147,483,647^000000.";
+				close;
+				}
+				if(.@amt > 100000000){
+					next;
+					mes .@n$;
+					mes "Recuerda que el ^800080limite maximo^000000 de ^7B7F26retirarada^000000 de ^FF1493Zeny^000000 al que se puede acceder por esta opcion es de ^A4A81A100 Millones^000000.";
+					close;
+				}
+					goto s_Proceed;
+				
+			break; // Fin Retiro con limite 
+			
+			case 2: // Retiro Parcial
+				if (#savings < 1){
+				mes .@n$;
+				mes "^0000FFNo dispone de ^FF0000fondos^000000 ^0000FFsuficientes por el momento^000000."; 
+				close;
+				}
+			
+			
+				if(Zeny == 2147483647 ) {
+				next;
+				mes .@n$;
+				mes "Lo siento, no puedo proceder a ^7B7F26retirar^000000 tu dinero. La maxima cantidad de ^FF1493Zeny^000000 que puedes llegar a tener en tu monedero son ^8000802,147,483,647^000000.";
+				close;
+				}
+				if (Zeny >= 2147483647 ) {
+					mes "Su Zeny ya está en su máximo.";
+					close;
+				} else {
+					set .@amt, 2147483647-Zeny;
+					if (.@amt > #savings)
+					set .@amt, #savings;
+					mes .@n$;
+					mes "^FF8C00Procedere a calcular cuanto puede ^7B7F26retirar^000000^FF8C00, espere un momento por favor...^000000";
+				}
+			break;
+		} 
+	break;
+	case 1: // Depositar Zeny
+		next;
+		switch(select("~ ^6E4C10Depositar^000000 con ^800080limite maximo^000000.", "~ ^6E4C10Depositar^000000 el total de mi ^FF1493Zeny^000000.")){
+			
+			case 1: // Deposito con limite maximo
+				mes .@n$;
+				mes "Con esta opcion podras ^6E4C10depositar^000000 cantidades exactas de ^FF1493Zeny^000000 pero debes saber que ^ff0000NO^000000 podras depositar mas de ^A4A81A100 Millones^000000 por movimiento.";
+				mes "Por favor, introduzca la cantidad de ^FF1493Zeny^000000 que desee ^6E4C10depositar^000000.";
+				input .@amt,0,.@mz;
+				
+				if ( .@amt < 1 )
+				{
+					next;
+					mes .@n$;
+					mes "^FF0000Por favor, no me haga perder el tiempo...^000000";
+					close;
+				}
+
+				if (Zeny == 0){
+				next;
+					mes .@n$;
+					mes "^0000FFNo dispone de ^FF1493Zeny^000000 ^0000FFsuficiente por el momento^000000."; 
+					close;
+				}				
+				
+				if(#savings >= 2147483647 ) {
+				next;
+				mes .@n$;
+				mes "Lo siento, no puedo proceder a ^6E4C10depositar^000000 tu dinero. La maxima cantidad de ^FF1493Zeny^000000 que puedes llegar a guardar en el banco son ^8000802,147,483,647^000000.";
+				close;
+				}
+				if(.@amt > 100000000){
+					next;
+					mes .@n$;
+					mes "Recuerda que el ^800080limite maximo^000000 para ^6E4C10depositar^000000 ^FF1493Zeny^000000 al que se puede acceder por esta opcion es de ^A4A81A100 Millones^000000.";
+					close;
+				}
+								
+					goto s_Proceed;
+			break;
+			
+			case 2: // Deposito Tokio
+				if (Zeny == 0){
+					mes .@n$;
+					mes "^0000FFNo dispone de ^FF1493Zeny^000000 ^0000FFsuficiente por el momento^000000."; 
+					close;
+				}
+				
+				
+				if (#savings >= 2147483647) {
+					mes .@n$;
+					mes "Lo siento, no puedo proceder a ^6E4C10depositar^000000 tu dinero. La maxima cantidad de ^FF1493Zeny^000000 que puedes llegar a guardar en el banco son ^8000802,147,483,647^000000.";
+					close;
+				} else {
+					set .@amt, 2147483647-#savings;
+					if (.@amt > Zeny)
+					set .@amt, Zeny;
+					mes .@n$;
+					mes "^FF8C00Procedere a calcular cuanto puede ^6E4C10depositar^000000^FF8C00, espere un momento por favor...^000000";
+				}
+			break;
+		}
+		break;
+	}
+	s_Withdraw:
+	if ( .@amt + #savings > .@mz )
+	{
+		next;
+		mes .@n$;
+		mes "^FF0000No se puede depositar más de 2000 millones en el banco...^000000";
+		close;
+	}
+	s_Proceed:
+	next;
+	if ( .@amt <= 0 )
+				{
+					next;
+					mes .@n$;
+					mes "^FF0000Por favor, no me haga perder el tiempo...^000000";
+					close;
+				}
+	mes .@n$;
+	mes (.@sel != 1)?"^FF1493Zeny^000000 a ^7B7F26retirar^000000: " + .@amt:"^6E4C10Deposito^000000 a ^FF1493realizar^000000: "+.@amt;
+	mes "Desea continuar?.";
+	if ( select ( "~ ^009900Si^000000:~ ^FF0000No^000000" ) == 2 ) close;
+	next;
+	mes .@n$;
+	if ( FailMessage(.@sel,.@amt,.@mz) != "" )
+	{
+		mes "^FF0000" +@msg$+ "^000000";
+		set @msg$, "";
+		close;
+	}
+	Transaction(.@sel,.@amt);
+	mes (.@sel !=1 )?"Su ^FF1493Zeny^000000 ha sido ^7B7F26retirado^000000 ^009900correctamente^000000. Gracias por usar nuestro servicio, que tenga un buen dia...":"Su ^FF1493Zeny^000000 ha sido depositado ^009900correctamente^000000. Gracias por usar nuestro servicio, que tenga un buen dia...";
+	close;
+	
+	function	FailMessage	{
+	
+		switch (getarg(0))
+		{
+			Case 0:	// Withdraw
+				if ( 2147483647 < (Zeny + getarg(1)) ) set @msg$, "La maxima cantidad de ^FF1493Zeny^000000 que puedes llegar a tener en tu monedero son ^8000802,147,483,647^000000.";
+				if ( #savings < getarg(1) ) set @msg$, "No dispone de fondos suficientes por el momento.";
+				break;
+				
+			Case 1:	// Deposit
+				if ( Zeny < getarg(1) ) set @msg$, "No dispone de fondos suficientes en su monedero.";
+				break;
+		}
+		return @msg$;
+	
+	}
+	
+	function	Transaction	{
+	
+		switch (getarg(0))
+		{
+			case 0:	// Withdraw
+				set Zeny, Zeny + getarg(1);
+				set #savings, #savings - getarg(1);
+				break;
+				
+			case 1:	// Deposit
+				set Zeny, Zeny - getarg(1);
+				set #savings, #savings + getarg(1);
+				break;
+		}
+		return;
+		
+	}
+}

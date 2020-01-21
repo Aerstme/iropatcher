@@ -1,0 +1,66 @@
+prontera,147,149,5	script	Exchanger	439,{
+	// Your Server Max Cash Amount
+	set .MaxCash,1000;     
+	set .MaxCoin,50;
+	// Coins Item ID and each Coins Costs
+	setarray .Coins[1],675;
+	setarray .CashPoint[1],1;
+	 
+	set @Menu$,"";
+	for( set .@a,1; .@a < getarraysize( .Coins ); set .@a,.@a+1 ){
+		set @Menu$,@Menu$ + getitemname( .Coins[.@a] )+":";
+		}
+	while( 1 ){
+		mes "What do you want to do today?";
+		next;
+		switch( select( "Coin to Cash Point:Cash Point to Coin" ) ){
+		Case 1:
+				mes "Very well. Here is the list on how much each coin is worth:";
+				for( set .@a,1; .@a < getarraysize( .Coins ); set .@a,.@a+1 ){
+					mes "^0000FF"+getitemname( .Coins[.@a] )+" ^FF0000"+.CashPoint[.@a]+"^000000 Cash.";
+					}
+				next;
+				set .@a,select( @Menu$ );
+				mes "Select the Amount of Coins you want to trade into Cash.";
+				mes "You have "+countitem( .Coins[.@a] )+" "+getitemname( .Coins[.@a] )+".";
+				input @Amount,0,countitem( .Coins[.@a] );
+				if( @Amount < 1 ){
+				mes "You cancelled.";
+				}else if( ( CashPoints + ( @Amount * .CashPoint[.@a] ) ) > .MaxCash ){
+				mes "You can hold this amount of Cash.";
+				}else{
+				set #CASHPOINTS,#CASHPOINTS + ( @Amount * .CashPoint[.@a] );
+				delitem .Coins[.@a],@Amount;
+				mes "Done, you have traded "+@Amount+" of "+getitemname(.Coins[.@a])+" into "+( @Amount * .CashPoint[.@a] )+" Cash.";
+				}
+				next;
+				break;
+		Case 2:
+				mes "Very well. Here is the list on how much each coin is worth:";
+				for( set .@a,1; .@a < getarraysize( .Coins ); set .@a,.@a+1 ){
+					mes "^0000FF"+getitemname( .Coins[.@a] )+" ^FF0000"+.CashPoint[.@a]+"^000000 Cash.";
+					}
+				next;
+				set .@a,select( @Menu$ );
+				mes "Select the Amount of Cash Points you want to trade into "+getitemname( .Coins[.@a] )+".";
+				mes "You can get maximum of "+MaxCash+" "+getitemname( .Coins[.@a] )+".";
+				input @Amount;
+				next;
+				if( @Amount < 1 ){
+					mes "You cancelled";
+					close;
+				}else if( @Amount > .MaxCoin ){
+					mes "Max Changed only 50 "+getitemname( .Coins[.@a] )+".";
+					close;
+				}else if( #CASHPOINTS < @Amount ){
+					mes "You doesn't enough cash point.";
+					close;
+				}
+			   
+				set #CASHPOINTS,#CASHPOINTS - ( @Amount );
+				getitem .Coins[.@a],@Amount;
+				mes "Done, you have traded "+( @Amount * .CashPoint[.@a] )+" Cash into "+@Amount+" of "+getitemname(.Coins[.@a])+" .";
+				close;
+				}
+				}
+}

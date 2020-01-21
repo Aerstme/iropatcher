@@ -12,16 +12,16 @@
 
 prontera,132,190,7	script	Universal Rental	726,{
 	mes "[ ^2e9c99Universal Rental^000000 ]";
-	mes "Hi!";
-	mes "With me you can get a Cart, Falcon or a PecoPeco, depending on the job and if you meet the requirements that this entails.";
+	mes "�Hola!";
+	mes "Conmigo puedes conseguir un carro, un halc�n o un peco, dependiendo del job que seas y de si cumples con los requisitos que esto conlleva.";
 	next;
 	mes "[ ^2e9c99Universal Rental^000000 ]";
-	mes "What do you want to do?";
+	mes "�Qu� deseas hacer?";
 	next;
-	menu "~ Rent a PecoPeco, Falcon o cart.", M1, "~ ^009900Rent premium carts^000000.", M2;
+	menu "~ Rentar peco, halc�n o carro.", M1, "~ ^009900Rentar carros premium^000000.", M2;
 	
 M1: if (ismounting()) {
-		dispbottom "#IRO: You must get off your mount to use this service.", 0xffff00;
+		dispbottom "#IRO: Debes bajarte de tu montura para poder usar este servicio.", 0xffff00;
 		end;
 	} else if (((eaclass()&EAJ_THIRDMASK)==EAJ_RANGER) && !countitem(6124)) {
 		if (!checkfalcon() && getskilllv("HT_FALCON") && !checkwug()) {
@@ -40,7 +40,7 @@ M1: if (ismounting()) {
 		else setriding;
 	} else if (!checkmadogear() && getskilllv("NC_MADOLICENCE")) setmadogear;
 	else {
-		dispbottom "#IRO: You don't meet the requirements to have this service.", 0xffff00;
+		dispbottom "#IRO: No cumples con los requisitos para poder usar este servicio.", 0xffff00;
 		end;
 	}
 	specialeffect2 EF_TEIHIT3;
@@ -48,18 +48,18 @@ M1: if (ismounting()) {
 	
 
 M2: 	mes "[ ^2e9c99Universal Rental^000000 ]";
-	mes "The ^800080premium carts^000000 are 7 new carts designs for Merchant class.";
+	mes "Los ^800080carros premium^000000 son 7 dise�os nuevos de carros para la clase Merchant.";
 	next;
 	mes "[ ^2e9c99Universal Rental^000000 ]";
-	mes "The cost to unlock all the ^800080premium carts^000000 designs in your account is 20,000 ^FF6133Cash points^000000.";
+	mes "El costo para desbloquear en tu cuenta el uso libre de todos los ^800080carros premium^000000 es de 20,000 ^FF6133Cash points^000000.";
 	next;
-	switch(select("~ ^777777See designs^000000.", (!#MCDECOR2PAID) ? "~ ^009900Unlock premium carts^000000.":"", (#MCDECOR2PAID) ? "~ ^1E90FFSkill Change Cart 2^000000.":"")) {
+	switch(select("~ ^777777Ver dise�os^000000.", (!#MCDECOR2PAID) ? "~ ^009900Desbloquear carros premium^000000.":"", (#MCDECOR2PAID) ? "~ ^1E90FFSkill Change Cart 2^000000.":"")) {
 	case 1:
-		// The picture is read from data\texture\Ã¬Å“Â Ã¬Â â‚¬Ã¬ÂÂ¸Ã­â€žÂ°Ã­Å½ËœÃ¬ÂÂ´Ã¬Å Â¤\illust
+		// The picture is read from data\texture\ìœ ì €ì¸í„°íŽ˜ì´ìŠ¤\illust
 		// cutin file name (must be *.bmp)
 		cutin "carts_new",4;
 		mes "[ ^2e9c99Universal Rental^000000 ]";
-		mes "These are the ^800080premium carts^000000.";
+		mes "Estos son los ^800080carros premium^000000.";
 		close2;
 		cutin "",255;
 		break;
@@ -67,23 +67,23 @@ M2: 	mes "[ ^2e9c99Universal Rental^000000 ]";
 	case 2:
        	 	if ( !#MCDECOR2PAID ) {
 		mes "[ ^2e9c99Universal Rental^000000 ]";
-        	mes "I'll need you give me 20,000 ^FF6133Cash points^000000 to unlock all the ^800080premium account^000000 in your account.";
-         	mes "Actual State: "+ #CASHPOINTS + " ^FF6133Cash points^000000.";
-		mes "Do you have them ready?";
+        	mes "Necesitar� que me entregues 20,000 ^FF6133Cash points^000000 para desbloquear el uso libre de todos los ^800080carros premium^000000 en tu cuenta.";
+         	mes "Estado actual: "+ #CASHPOINTS + " ^FF6133Cash points^000000.";
+		mes "�Los tienes preparados?";
         	next;
-        	if (select("~ ^009900Give Cash points^000000.:~ ^FF0000No, not yet^000000.")==2)close;
+        	if (select("~ ^009900Entregar Cash points^000000.:~ ^FF0000No, a�n no^000000.")==2)close;
            	   if ( #CASHPOINTS < 20000 ) {
 			mes "[ ^00BFFFUniversal Rental^000000^000000 ]";
-			mes "~ ^FF0000Sorry, you don't have what i need to enjoy this service^000000.";
+			mes "~ ^FF0000No tienes lo que necesito para poder disfrutar de mi servicio^000000.";
                 	close;
             	}
        	 }
 		mes "[ ^2e9c99Universal Rental^000000 ]";
-		mes "^009900¡Listo!^000000";
-		mes "Press (Alt + S) and you'll see your skill tree, on this, you gonna find a skill called *^1E90FFChange Cart 2^000000* With it you can choose all the ^800080Premium carts^000000.";
+		mes "^009900�Listo!^000000";
+		mes "Presiona (Alt + S) y se abrir� tu arbol de habilidades, en este, encontrar�s una Skill llamada *^1E90FFChange Cart 2^000000* con la que podr�s elegir todos los ^800080carros premium^000000.";
 		next;
 		mes "[ ^2e9c99Universal Rental^000000 ]";
-		mes "Remember, now all the characters on this account that are of the Merchant Class, talking with me, will be able to enjoy this service and no need to pay anything else.";
+		mes "Recuerda, ahora todos los personajes de esta cuenta que sean de la clase Merchant, hablando conmigo, podr�n disfrutar de este servicio sin necesidad de pagar nada m�s.";
         	close2;
         	skill 2544,1,SKILL_PERM_GRANT;
         	#CASHPOINTS -= 20000;
@@ -91,8 +91,8 @@ M2: 	mes "[ ^2e9c99Universal Rental^000000 ]";
        	 	break;	
 	case 3:
 		mes "[ ^2e9c99Universal Rental^000000 ]";
-		mes "^009900It's ready!^000000";
-		mes "Press (Alt + S) and you'll see your skill tree, on this, you gonna find a skill called *^1E90FFChange Cart 2^000000* With it you can choose all the ^800080carros premium^000000.";
+		mes "^009900�Listo!^000000";
+		mes "Presiona (Alt + S) y se abrir� tu arbol de habilidades, en este, encontrar�s una skill llamada *^1E90FFChange Cart 2^000000* con la que podr�s elegir todos los ^800080carros premium^000000.";
 		close2;
 		skill 2544,1,SKILL_PERM_GRANT;
 		break;

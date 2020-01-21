@@ -1,0 +1,1026 @@
+prontera,150,160,0	script	Events	100,{
+	function add_event;
+	function set_mapflags;
+	function remove_mapflags;
+	mes "What do you want to do?";
+	next;
+	menu "Join Event", OnJoin, "Information", OnInfo, "Claim Prize", OnPrize;
+
+OnInit:
+	// Only GM can access this command..
+	//bindatcmd "event","Events::OnJoin",60,60;
+	//bindatcmd "events","Events::OnInfo";,60,60;
+	//bindatcmd "prize","Events::OnPrizeCommand",60,60;
+
+	// Level of GM required to manage events.
+	.gm = 60;
+
+	/*
+
+		How to add events?
+
+		add_event(<"name of the script">,<"name to show">,<prize id>,<prize amount>,<entries>,<"map">,<x>,<y>,<mapflags...>);
+
+		Entries 0 = unlimited.
+		You'll have to create a script with the specified name and OnStart label.
+		When the event finishes you'll have to execute donpcevent "Events::OnEndEvent"; This will handle the variables and mapflags if necessary.
+
+		$@open_event = true will enable players joining with the @event command. This can only be used with events which use an specified map.
+
+		To redeem prizes, use doevent "Events::OnPrize";
+
+		You can have specific prizes (exp, buffs, expiral items, etc.) using .event_active on the OnPrize label
+		The value of .event_active, as of now, is the next depending of the event:
+
+		[1] = Dices.
+		[2] = Find the Porings.
+		[3] = Escape from the Bombrings.
+		[4] = Guess the Monster.
+		[5] = Pick the candy.
+		[6] = Devil Square.
+		[7] = Cluckers.
+
+		Example:
+
+		if(@event_prize == 4)
+			getexp 100,100;
+		else if(@event_prize == 5)
+			StatusPoint+= 10;
+
+		This will give 100 base & job exp if a players wins a round on the disguise (guess the monster) event, or 10 stat points if he wins the pick the candy event.
+
+		Devil Square event has a special type of prize. If you want to have a normal prize as well just add doevent "Events::OnPrize"; on the Onboxdead label.
+
+		Remember to use conditions with $@end_event to finish the events manually!
+
+	*/
+
+	add_event("Event_Dice","Dices",7539,20,0,"quiz_02",55,87,mf_nowarp,mf_nowarpto,mf_noskill,mf_noteleport,mf_nomemo,mf_nosave,mf_noicewall,mf_nobranch,mf_noreturn);
+	add_event("Event_PoringFind","Find the Porings",7539,20,0,"pvp_y_1-2",0,0,mf_noreturn,mf_nowarp,mf_nowarpto,mf_nosave,mf_nomemo,mf_nopenalty,mf_noreturn,mf_nobranch,mf_nomobloot,mf_nomvploot);
+	add_event("Event_Bombring","Escape from the Bombrings",7539,30,0,"quiz_02",59,345,mf_noreturn,mf_noskill,mf_nowarp,mf_nowarpto,mf_nosave,mf_nomemo,mf_noteleport,mf_nopenalty,mf_noreturn,mf_nobranch,mf_nomobloot,mf_nomvploot);
+	add_event("Disguiser","Guess the monster",7539,15,0,"none");
+	add_event("Event_CandyEvent","Pick the candy",7539,20,0,"guild_vs2",0,0,mf_nosave,mf_nowarp,mf_nowarpto,mf_noteleport,mf_nomemo,mf_nobranch,mf_noicewall,mf_noskill);
+	add_event("Clucker","Cluckers",7539,25,0,"none");
+
+// If you're willing to change this, remember to change donpcevent "Events::OnClock1200"; as well.
+// I put it this way to avoid having an event every hour or so which doesn't always trigger just for the sake of it.
+OnClock1200:
+
+	// Amount of events in the queue. You can change this value as you wish.
+	// Default: 5~8
+	.@n = rand(5,8);
+
+	.@size = getarraysize(.events$);
+	.@num  = getarraysize(.event);
+	.@tick = gettimetick(2);
+	freeloop true;
+	for(;.@i < .@n;.@i++) {
+		do {
+			.event[.@num + .@i] = .@prev = rand(.@size) + 1;
+			if(!(.@num + .@i))
+				break;
+		} while(.@prev == .event[.@num + .@i - 1]);
+		// You can change the time variation here.
+		// Default: [n° of event]*(15~60m) + (1m40s~25m)
+		.@time+= ((.@i + 1)*15*60*rand(1,4)) + rand(100,1500);
+		.event_time[.@num + .@i] = .@tick + .@time;
+	}
+	freeloop false;
+	if(!.@num)
+		donpcevent "Events::OnQueue";
+	end;
+
+OnQueue:
+
+	while(.event_time[0] > 0) {
+		.@time = .event_time[0];
+		.@tick = gettimetick(2);
+		if(.@tick < .@time && !.event_active) {
+			sleep (.@time - .@tick)*1000;
+			if(!.noqueue) {
+				.event_active = .event[0];
+				if(.maps$[.event[0] - 1] != "")
+					set_mapflags(.event[0] - 1);
+				donpcevent .events$[.event[0] - 1]+"::OnStart";
+			}
+		}
+		while(.event_active)
+			sleep 25000;
+		if(!.noqueue && gettimetick(2) >= .@time) {
+			deletearray .event[0],1;
+			deletearray .event_time[0],1;
+		}
+	}
+	end;
+
+OnJoin:
+
+	if(.event_active) {
+		if(.maps$[.event_active - 1] != "") {
+			.@m$ = strcharinfo(3);
+			if(.@m$ != .maps$[.event_active - 1] && !getmapflag(.@m$,mf_pvp) && !getmapflag(.@m$,mf_gvg) && !getmapflag(.@m$,mf_battleground) && $@open_event) {
+				if(.event_active == 5 && checkcart()) {
+					mes "You can't enter the Pick the Candy event using a cart.",0xf47a0d;
+				} else if ( .event_active == 2 || .event_active == 3 || .event_active == 5 ) {
+					if ( BaseLevel > 1 || Class > 0 ) {
+						mes "Only Level 1 Novice can join this event.";
+						close;
+					}
+				} else {
+					if(.event_active == 5)
+						delitem 529,countitem(529);
+					if(!.limit[.event_active - 1] || getmapusers(.maps$[.event_active - 1]) < .limit[.event_active - 1])
+						warp .maps$[.event_active - 1],.cords[(.event_active - 1)*2],.cords[(.event_active - 1)*2 + 1];
+					else
+						mes "I'm sorry but there aren't more entries left to the event.",0xf47a0d;
+				}
+			} else if($@open_event) {
+				mes "You're already on the event, or you're in a fights map.",0xf47a0d;
+			} else {
+				mes "The entry to the event is now closed.",0xf47a0d;
+			}
+		}
+	} else {
+		mes "There isn't an event going right now.",0xf47a0d;
+	}
+	end;
+
+OnInfo:
+
+	if(getgmlevel() >= .gm) {
+		.@n$ = "^3227cd[Events Manager]^000000";
+		while(.@s < 4) {
+			mes .@n$;
+			mes "What do you want to do?";
+			next;
+			if(!.event_active)
+				.@option0$ = "Start an event.";
+			else
+				.@option0$ = "Finish current event.";
+			if(!.noqueue)
+				.@option1$ = "Disable event queue.";
+			else
+				.@option1$ = "Enable event queue.";
+			.@s = select("^890a19Exit.^000000",.@option0$,.@option1$,"View events list.");
+			if(.@s > 1)
+				mes .@n$;
+			switch(.@s) {
+			case 2:
+				if(!.event_active) {
+					mes "Select an event.";
+					if(.@menu$ == "")
+						.@menu$ = implode(.names$,".:")+".";
+					next;
+					.@e = select("^890a19Back.^000000",.@menu$,"^c54f0eRandom.^000000") - 1;
+					if(.@e) {
+						mes .@n$;
+						if(!.event_active) {
+							mes "The event will now start.";
+							if(.@e > .events)
+								.@e = rand(1,.events);
+							.event_active = .@e;
+							if(.maps$[.@e - 1] != "")
+								set_mapflags(.@e - 1);
+							donpcevent .events$[.@e - 1]+"::OnStart";
+						} else {
+							mes "There's an event going on right now. Wait for it to finish or do it manually.";
+						}
+					}
+				} else {
+					mes "The event will now be stopped.";
+					$@end_event = true;
+					awake .events$[.event_active - 1];
+				}
+				break;
+			case 3:
+				if(!.noqueue) {
+					.noqueue = true;
+					deletearray .event;
+					deletearray .event_time;
+					awake "Events";
+					mes "The queue has been disabled.";
+				} else {
+					mes "The queue has been enabled.";
+					.noqueue = false;
+					donpcevent "Events::OnClock1200";
+				}
+				break;
+			case 4:
+				mes "The list will be shown as soon as you close this window.";
+				.@show = true;
+			}
+			if(.@show)
+				close2;
+			else if(.@s == 1)
+				close;
+			else
+				next;
+		}
+	}	
+	mes "========= Event list =========",0xcce4e5;
+	if(.event_active)
+		mes .names$[.event_active - 1]+": active.",0x6e96fc;
+	.@tick = gettimetick(2);
+	for(.@size = getarraysize(.event);.@i < .@size;.@i++) {
+		.@start = .event_time[.@i];
+		if(.@start - .@tick < 30*60)
+			mes .names$[.event[.@i] - 1]+": "+Time2Str(.@start)+".",0xb86671;
+		else
+			mes .names$[.event[.@i] - 1]+": "+Time2Str(.@start)+".",0xe0d4db;
+	}
+	if(!.@size)
+		mes "There aren't events in the queue right now.",0xd11325;
+	mes "==========================",0xcce4e5;
+	close;
+
+OnPrize:
+
+	if(.prize_id[@event_prize - 1] && .prize_amt[@event_prize - 1]) {
+		if(checkweight(.prize_id[@event_prize - 1],.prize_amt[@event_prize - 1])) {
+			getitem .prize_id[@event_prize - 1],.prize_amt[@event_prize - 1];
+		} else {
+			mes "You couldn't get your event reward since you have overweight.";
+			mes "Try to free some weight and then claim your prize.";
+			event_prize = @event_prize;
+		}
+	}
+	@event_prize = 0;
+	close;
+
+OnPrizeCommand:
+
+	if(event_prize) {
+		if(checkweight(.prize_id[event_prize - 1],.prize_amt[event_prize - 1])) {
+			getitem .prize_id[event_prize - 1],.prize_amt[event_prize - 1];
+			event_prize = 0;
+		} else {
+			message strcharinfo(0),"You still have overweight. Try to free some and use the command again.";
+		}
+	} else {
+		message strcharinfo(0),"I'm sorry but you don't have any prize on list.";
+	}
+	end;
+
+OnEndEvent:
+
+	if(.maps$[.event_active - 1] != "") {
+		remove_mapflags(.maps$[.event_active - 1]);
+		mapwarp .maps$[.event_active -1],"prontera",rand(148,163),rand(167,186);
+	}
+	.event_active = 0;
+	$@end_event   = false;
+	$@open_event  = false;
+	awake "Events";
+	end;
+
+	
+	function	add_event	{
+
+		.@event$ = getarg(0);
+		.@name$  = getarg(1);
+		.@itemid = getarg(2);
+		.@amount = getarg(3);
+		.@limit  = getarg(4);
+		.@map$   = getarg(5);
+		.@x      = getarg(6,0);
+		.@y      = getarg(7,0);
+
+		.events$[.events] = .@event$;
+		.names$[.events]  = .@name$;
+		if(.@itemid && .@amount) {
+			.prize_id[.events]  = .@itemid;
+			.prize_amt[.events] = .@amount;
+		}
+		if(.@limit)
+			.limit[.events] = .@limit;
+		if(.@map$ != "none") {
+			.maps$[.events] = .@map$;
+			setarray .cords[.events*2],.@x,.@y;
+
+			.@args = getargcount();
+			for(.@i = 8;.@i < .@args;.@i++)
+				setd ".mapflags"+.events+"["+(.@i - 8)+"]",getarg(.@i);
+		}
+
+		.events++;
+
+	}
+
+	function	set_mapflags	{
+
+		.@index = getarg(0);
+		.@m$    = .maps$[.@index];
+
+		for(.@size = getarraysize(getd(".mapflags"+.@index));.@i < .@size;.@i++) {
+			.@mapflag = getd(".mapflags"+.@index+"["+.@i+"]");
+			if(!getmapflag(.@m$,.@mapflag)) {
+				setd "."+.@m$+"_"+.@j,.@mapflag + 1;
+				setmapflag .@m$,.@mapflag;
+				.@j++;
+			}
+		}
+
+	}
+
+	function	remove_mapflags	{
+
+		.@m$ = getarg(0);
+
+		while(getd("."+.@m$+"_"+.@i)) {
+			removemapflag .@m$,getd("."+.@m$+"_"+.@i) - 1;
+			setd "."+.@m$+"_"+.@i,0;
+			.@i++;
+		}
+
+	}
+
+}
+
+// Credits to sandbox.
+-	script	Event_Dice	-1,{
+
+OnStart:
+
+	$@open_event = true;
+	for(.@i = 1;.@i <= 4;.@i++) {
+		disablenpc "Back#"+.@i;
+		disablenpc "Box "+.@i;
+	}
+	announce "The Dices event will soon begin.",bc_all,0x0ceedb;
+	sleep 2000;
+	announce "If you want to join use the @event command.",bc_all,0x0ceedb;
+	sleep 2000;
+	announce "The entry will be open for 1 minute.",bc_all,0x0ceedb;
+	sleep 30000;
+	announce "30 seconds left to close the entries to the Dice event.",bc_all,0x0ceedb;
+	sleep 30000;
+	announce "The entry to the event is now closed.",bc_all,0x0ceedb;
+	$@open_event = false;
+	sleep 3500;
+	mapannounce "quiz_02","We're about to begin the event.",bc_all,0x0ceedb;
+	sleep 2500;
+	mapannounce "quiz_02","The rules are simple.",bc_all,0x0ceedb;
+	sleep 2500;
+	mapannounce "quiz_02","You'll have to enter one of the 4 avaiaible boxes.",bc_all,0x0ceedb;
+	sleep 2500;
+	mapannounce "quiz_02","Then a four sides dice will be thrown. The number it shows will be the saved number.",bc_all,0x0ceedb;
+	sleep 2500;
+	mapannounce "quiz_02","Remember to enter the boxes!",bc_all,0x0ceedb;
+	sleep 2000;
+	mapannounce "quiz_02","That's all. Let's begin.",bc_all,0x0ceedb;
+	sleep 3000;
+	while(!.@end && !$@end_event && .@rounds < 5) {
+		for(.@i = 1;.@i <= 4;.@i++) {
+			enablenpc "Back#"+.@i;
+			enablenpc "Box "+.@i;
+		}
+		sleep 1500;
+		mapannounce "quiz_02","The dice will soon be thrown. Enter the desired box clicking the metalic number inside them.",bc_all,0x0ceedb;
+		sleep 20000;
+		for(.@i = 5;.@i > 0;.@i--) {
+			mapannounce "quiz_02",.@i+"...",bc_all,0x0ceedb;
+			sleep 990;
+		}
+		for(.@i = 1;.@i <= 4;.@i++) {
+			disablenpc "Back#"+.@i;
+			disablenpc "Box "+.@i;
+		}
+		areawarp "quiz_02",32,95,79,76,"prontera",rand(148,163),rand(167,186);
+		areawarp "quiz_02",80,85,80,76,"prontera",rand(148,163),rand(167,186);
+		areawarp "quiz_02",31,85,31,76,"prontera",rand(148,163),rand(167,186);
+		.@n = rand(1,4);
+		mapannounce "quiz_02","Time! The dice shows the number "+.@n+".",bc_all,0x0ceedb;
+		setarray .@cords1[0],33,41;
+		setarray .@cords2[0],45,53;
+		setarray .@cords3[0],57,65;
+		setarray .@cords4[0],69,77;
+		for(.@i = 1;.@i <= 4;.@i++) {
+			if(.@i != .@n)
+				areawarp "quiz_02",getd(".@cords"+.@i+"[0]"),52,getd(".@cords"+.@i+"[1]"),73,"prontera",rand(148,163),rand(167,186);
+		}
+		sleep 3000;
+		.@players = getmapusers("quiz_02");
+		if(.@players <= 3 && !$@end_event && .@players) {
+			.@end = true;
+			mapannounce "quiz_02","The event is now over! Winners, enjoy your prizes!",bc_all,0x0ceedb;
+			.@size = getmapunits(BL_PC,"quiz_02",.@players);
+			for(.@i = 0;.@i < .@size;.@i++) {
+				attachrid .@players[.@i];
+				announce strcharinfo(0)+" has won the Dice Event.",bc_all,0x0ceedb;
+				@event_prize = 1;
+				doevent "Events::OnPrize";
+				warp "prontera",rand(148,163),rand(167,186);
+			}
+		} else if(.@players < 1) {
+			.@end = true;
+			announce "There was no winner on the Dice Event.",bc_all,0x0ceedb;
+		} else {
+			mapannounce "quiz_02","There's no clear winners yet, let's roll the dice again.",bc_all,0x0ceedb;
+		}
+		.@rounds++;
+	}
+	if(.@rounds >= 5)
+		mapannounce "There were no winner clear in all of the event. The event is now over.",bc_all,0x0ceedb;
+	donpcevent "Events::OnEndEvent";
+	end;
+
+}
+
+
+quiz_02,37,80,3	script	Box 1	HIDDEN_NPC,{
+
+	warp "quiz_02",rand(33,41),rand(52,73);
+	end;
+
+}
+
+quiz_02,49,80,3	script	Box 2	HIDDEN_NPC,{
+
+	warp "quiz_02",rand(45,53),rand(52,73);
+	end;
+
+}
+
+quiz_02,61,80,3	script	Box 3	HIDDEN_NPC,{
+
+	warp "quiz_02",rand(57,65),rand(52,73);
+	end;
+
+}
+
+quiz_02,73,80,3	script	Box 4	HIDDEN_NPC,{
+
+	warp "quiz_02",rand(69,77),rand(52,73);
+	end;
+
+}
+
+quiz_02,55,90,3	script	Back to Prontera	4_BULLETIN_BOARD2,{
+
+	warp "prontera",rand(148,163),rand(167,186);
+	end;
+}
+
+quiz_02,37,64,3	script	Back#1	4_BULLETIN_BOARD2,{
+
+	warp "quiz_02",55,76;
+	end;
+
+}
+
+quiz_02,49,64,3	duplicate(Back#1)	Back#2	4_BULLETIN_BOARD2
+quiz_02,61,64,3	duplicate(Back#1)	Back#3	4_BULLETIN_BOARD2
+quiz_02,73,64,3	duplicate(Back#1)	Back#4	4_BULLETIN_BOARD2
+
+// Credits Stolao.
+-	script	Event_PoringFind	-1,{
+OnInit:
+	// keep all pvp to off all the time.
+	pvpoff "guild_vs2";
+	pvpoff "quiz_02";
+	pvpoff "pvp_y_1-2";
+	end;
+
+OnStart:
+
+	$@open_event = true;
+	announce "The Find the Poring event will soon begin.",bc_all,0x0ceedb;
+	sleep 2000;
+	announce "If you want to join use the @event command.",bc_all,0x0ceedb;
+	sleep 2000;
+	announce "The entry will be open for 1 minute.",bc_all,0x0ceedb;
+	sleep 30000;
+	announce "30 seconds left to close the entries to the Find the Poring event.",bc_all,0x0ceedb;
+	sleep 30000;
+	announce "The entry to the event is now closed.",bc_all,0x0ceedb;
+	$@open_event = false;
+	sleep 3500;
+	mapannounce "pvp_y_1-2","We're about to begin the event.",bc_all,0x0ceedb;
+	sleep 2500;
+	mapannounce "pvp_y_1-2","The rules are the next.",bc_all,0x0ceedb;
+	sleep 4500;
+	mapannounce "pvp_y_1-2","Those who kill a Poring with a correct name will be awarded and warped out to Prontera.",bc_all,0x0ceedb;
+	sleep 4500;
+	mapannounce "pvp_y_1-2","Those who kill a Poring with an incorrect name will be simply warped Prontera.",bc_all,0x0ceedb;
+	sleep 4500;
+	mapannounce "pvp_y_1-2","There're 3 correct Porings. You'll have 20 minutes to find them.",bc_all,0x0ceedb;
+	sleep 4000;
+	mapannounce "pvp_y_1-2","The event will now begin. Have a good time!",bc_all,0x0ceedb;
+	setarray .names$[0],"Puring","Puding","P0ring","Porng","Poporing","Poging","Pink Creature","Disguised Player","Game Master","Por1ng","Prng","Porin6","Jelly","Don't kill me","Kill me","Winnering";
+	for(.size = getarraysize(.names$);.@i < 150;.@i+= 5)
+		monster "pvp_y_1-2",0,0,.names$[rand(.size)],1002,5,"Event_PoringFind::OnKillWrong";
+	monster "pvp_y_1-2",0,0,"--ja--",1002,3,"Event_PoringFind::OnKillRight";
+	for(.@time = 20;.@time && !.@end && !$@end_event;.@time--) {
+		if(getmapusers("pvp_y_1-2") < 1 || .right >= 3) {
+			.@end = true;
+		} else {
+			if(.@time < 20)
+				mapannounce "pvp_y_1-2",F_InsertPlural(.@time,"minute")+" left.",bc_all,0x0ceedb;
+			sleep 60000;
+		}
+	}
+	if(!$@end_event)
+		mapannounce "pvp_y_1-2","Time is over!",bc_all,0x0ceedb;
+	announce "The Find the Poring event is now over.",bc_all,0x0ceedb;
+	killmonsterall "pvp_y_1-2";
+	deletearray .names$;
+	.size  = 0;
+	.right = 0;
+	donpcevent "Events::OnEndEvent";
+	end;
+
+OnKillRight:
+
+	.right++;
+	mapannounce "pvp_y_1-2",strcharinfo(0)+" has found a correct poring! ("+.right+"/3)",bc_all,0x0ceedb;
+	@event_prize = 2;
+	doevent "Events::OnPrize";
+	warp "prontera",rand(148,163),rand(167,186);
+	if(.right >= 3)
+		awake "Event_PoringFind";
+	end;
+
+OnKillWrong:
+
+	monster "pvp_y_1-2",0,0,.names$[rand(.size)],1002,1,"Event_PoringFind::OnKillWrong";
+	warp "prontera",rand(148,163),rand(167,186);
+	end;
+
+}
+
+
+// Credits to Stolao.
+-	script	Event_Bombring	-1,{
+
+OnStart:
+
+	$@open_event = true;
+	mapwarp "quiz_02","prontera",rand(148,163),rand(167,186);
+	announce "The Run from the Bombrings event will soon begin.",bc_all,0x0ceedb;
+	sleep 2000;
+	announce "If you want to join use the @event command.",bc_all,0x0ceedb;
+	sleep 2000;
+	announce "The entry will be open for 1 minute.",bc_all,0x0ceedb;
+	sleep 30000;
+	announce "30 seconds left to register to Run from the Bombrings event.",bc_all,0x0ceedb;
+	sleep 30000;
+	announce "The entry to the event has been closed.",bc_all,0x0ceedb;
+	$@open_event = false;
+	sleep 3500;
+	.@players = getmapusers("quiz_02");
+	if(.@players < 3) {
+		announce "The event has been cancelled due to a low amount of players.",bc_all,0x0ceedb;
+	} else {
+		mapannounce "quiz_02","We're about to begin the event.",bc_all,0x0ceedb;
+		sleep 2500;
+		mapannounce "quiz_02","There will be Bombrings everywhere.",bc_all,0x0ceedb;
+		sleep 2500;
+		mapannounce "quiz_02","And every sigle one of them will explode, so be careful.",bc_all,0x0ceedb;
+		sleep 2500;
+		mapannounce "quiz_02","As time goes, more Bombrings will appear.",bc_all,0x0ceedb;
+		sleep 2500;
+		mapannounce "quiz_02","So be prepared! Because they will come even if you're not!",bc_all,0x0ceedb;
+		sleep 25000;
+		for(.@i = 0;.@i < 5 && !.@end && !$@end_event;.@i++) {
+			areamonster "quiz_02",48,334,71,357,"Bombring",1904,min(.@players*(.@i + 1)*80/100,50);
+			if(!getmapusers("quiz_02"))
+				.@end = true;
+			else
+				sleep 7000 - .@i*1000;
+		}
+		sleep 3000;
+		if(!.@end) {
+			killmonsterall "quiz_02";
+			.@size = getmapunits(BL_PC,"quiz_02",.@players);
+			for(.@i = 0;.@i < .@size;.@i++) {
+				attachrid .@players[.@i];
+				if(HP > 0) {
+					@event_prize = 3;
+					doevent "Events::OnPrize";
+					announce strcharinfo(0)+" has won the Run from the Bombrings event!",bc_all,0x0ceedb;
+				}
+				warp "prontera",rand(148,163),rand(167,186);
+			}
+		} else {
+			announce "There was no winner on the Run from the Bombrings event!",bc_all,0x0ceedb;
+		}
+	}
+	donpcevent "Events::OnEndEvent";
+	end;
+
+}
+
+// Credits to GmOcean.
+prontera,156,173,4	script	Disguiser	4_XMAS_CAT2,{
+
+	end;
+
+OnStart:
+
+	announce "The Guess the Monster event will begin in 3 minutes in Prontera.",bc_all,0x0ceedb;
+	sleep 60000;
+	announce "The Guess the Monster event will begin in 2 minutes in Prontera.",bc_all,0x0ceedb;
+	sleep 60000;
+	announce "The Guess the Monster event will begin in 1 minute! If you want to be part of it, come to Prontera.",bc_all,0x0ceedb;
+	sleep 40000;
+	announce "You'll have to tell me which monster I disguised as. First person to guess will receive a prize. Be prepared!",bc_all,0x0ceedb;
+	.@npc$ = strnpcinfo(0);
+	enablenpc .@npc$;
+	areawarp "prontera",156 - 2,173 - 2,156 + 2,173 + 2,"prontera",F_Rand(156 - 3,156 + 3),F_Rand(173 - 3,173 + 3);
+	sleep 20000;
+	announce "The Guess the Monster event has started!",bc_all,0x0ceedb;
+	while(.@rounds < 5 && !$@end_event) {
+		.winner = false;
+		.@mob = rand(1001,1995);
+		freeloop true;
+		while(compare(",1003,1006,1017,1021,1022,1027,1043,1075,1136,1137,1168,1171,1172,1173,1181,1182,1187,1210,1217,1218,1222,1223,1224,1225,1226,1227,1228,1233,1284,1407,1411,1414,1495,1501,1900,1902,1903,1905,1906,1907,1908,1909,1910,1911,1912,1913,1914,1915,1955,1959,1960,1961,1962,1963,",
+				  ","+.@mob+",") || (.@mob >= 1324 && .@mob <= 1363) || (.@mob >= 1938 && .@mob <= 1946) || inarray(.@mob_list,.@mob) >= 0)
+			.@mob = rand(1001,1995);
+		freeloop false;
+		.@mob_list[.@rounds] = .@mob;
+		.name$ = getmonsterinfo(.@mob,MOB_NAME);
+		deletepset 1;
+		defpattern 1,"([^:]+):.\\s*"+.name$+".*","OnCorrect";
+		activatepset 1;
+		setnpcdisplay .@npc$,.@mob;
+		sleep 30000;
+		if(!.winner)
+			npctalk "You took too much to guess it! I was a "+.name$+".";
+		specialeffect EF_DETECT2;
+		setnpcdisplay .@npc$,4_XMAS_CAT2;
+		if(.@rounds < 4) {
+			mapannounce "prontera","Now, let's go with another round.",bc_all,0x0ceedb;
+			sleep 10000;
+		}
+		.@rounds++;
+	}
+	mapannounce "prontera","The event is now over! Thank you for your participation!",bc_all,0x0ceedb;
+	setnpcdisplay .@npc$,4_XMAS_CAT2;
+	.name$ = "";
+	disablenpc .@npc$;
+	donpcevent "Events::OnEndEvent";
+	end;
+
+OnCorrect:
+
+	if(.winner) {
+		dispbottom "I'm sorry, but someone guessed it before you.";
+	} else {
+		.winner = true;
+		announce strcharinfo(0)+" is the first one to guess!",bc_map,0x0ceedb;
+		npctalk "I was a "+.name$+", like "+strcharinfo(0)+" said.";
+		@event_prize = 4;
+		doevent "Events::OnPrize";
+		setnpcdisplay strnpcinfo(0),4_XMAS_CAT2;
+		awake strnpcinfo(0);
+	}
+	end;
+
+OnInit:
+
+	disablenpc strnpcinfo(0);
+	end;
+
+}
+
+// Credits to AnnieRuru.
+-	script	Event_CandyEvent	-1,{
+
+OnStart:
+
+	$@open_event = true;
+	mapwarp "guild_vs2","prontera",rand(148,163),rand(167,186);
+	removemapflag "guild_vs2",mf_gvg;
+	removemapflag "guild_vs2",mf_pvp_noparty;
+	announce "The Pick the Candy event will soon begin.",bc_all,0x0ceedb;
+	sleep 2000;
+	announce "If you want to join use the @event command.",bc_all,0x0ceedb;
+	sleep 2000;
+	announce "The entry will be open for 1 minute.",bc_all,0x0ceedb;
+	sleep 30000;
+	announce "30 seconds left to start the Pick the Candy event.",bc_all,0x0ceedb;
+	sleep 30000;
+	announce "The entry is now closed.",bc_all,0x0ceedb;
+	$@open_event = false;
+	sleep 3500;
+	if(getmapusers("guild_vs2") < 2) {
+		announce "The Pick the Candy event is canceled due to a low amount of players.",bc_all,0x0ceedb;
+	} else {
+		mapannounce "guild_vs2","We're ready to start the event.",bc_all,0x0ceedb;
+		sleep 2500;
+		mapannounce "guild_vs2","You'll have to be cautious. Some candies will appear across the map.",bc_all,0x0ceedb;
+		sleep 2500;
+		mapannounce "guild_vs2","You'll have to pick the most you can!",bc_all,0x0ceedb;
+		sleep 2500;
+		mapannounce "guild_vs2","The event will soon begin! Be prepared!",bc_all,0x0ceedb;
+		sleep 3500;
+		.@num     = getmapusers("guild_vs2");
+		.@candies = .@num*12;
+		while(.@i < .@candies) {
+			getfreecell "guild_vs2",.@x,.@y;
+			makeitem 529,1,"guild_vs2",.@x,.@y;
+			.@i++;
+		}
+		mapannounce "guild_vs2","Pick the Candy event has started!",bc_all,0x0ceedb;
+		sleep 30000;
+		cleanmap "guild_vs2";
+		.@n = getmapunits(BL_PC,"guild_vs2",.@players),
+		for(.@i = 0;.@i < .@n;.@i++) {
+			attachrid .@players[.@i];
+			.@amount = countitem(529);
+			if(.@amount >= .@highest && .@amount >= 2 && !checkcart()) {
+				.@highest = .@amount;
+				.@winner[.@j++] = .@players[.@i];
+			}
+		}
+		if(.@j) {
+			while(.@j--) {
+				if(attachrid(.@winner[.@j])) {
+					.@amount = countitem(529);
+					if(.@amount >= .@highest) {
+						delitem 529,.@amount;
+						announce strcharinfo(0)+" has won the Pick the Candy event.",bc_all,0x0ceedb;
+						@event_prize = 5;
+						doevent "Events::OnPrize";
+					}
+				}
+			}
+		} else {
+			announce "There were no winners in the Pick the Candy event.",bc_all,0x0ceedb;
+		}
+	}
+	setmapflag "guild_vs2",mf_gvg;
+	setmapflag "guild_vs2",mf_pvp_noparty;
+	sleep 3000;
+	donpcevent "Events::OnEndEvent";
+	end;
+
+}
+
+-	script	Event_DevilSquare	-1,{
+
+OnStart:
+
+	$@open_event = true;
+	mapwarp "ordeal_1-1","prontera",rand(148,163),rand(167,186);
+	disablenpc "ord11-12";
+	announce "The Devil Square Event will soon begin.",bc_all,0x0ceedb;
+	sleep 2000;
+	announce "If you want to join use the @event command.",bc_all,0x0ceedb;
+	sleep 2000;
+	announce "There will be only 10 entries, so be fast!",bc_all,0x0ceedb;
+	sleep 2500;
+	announce "The entry will be open for 1 minute.",bc_all,0x0ceedb;
+	sleep 30000;
+	announce "30 seconds remaining for the Devil Square entry.",bc_all,0x0ceedb;
+	sleep 30000;
+	announce "The entry to the event is now closed.",bc_all,0x0ceedb;
+	$@open_event = false;
+	sleep 3500;
+	mapannounce "ordeal_1-1","We're almost ready to start the event.",bc_all,0x0ceedb;
+	sleep 2500;
+	mapannounce "ordeal_1-1","There will be 3 waves of monsters.",bc_all,0x0ceedb;
+	sleep 2500;
+	mapannounce "ordeal_1-1","If you can survive them all, 10 treasure chests will appear.",bc_all,0x0ceedb;
+	sleep 2500;
+	mapannounce "ordeal_1-1","Be prepared. The event will begin in 2 minutes.",bc_all,0x0ceedb;
+	sleep 60000;
+	mapannounce "ordeal_1-1","1 minute left to start Devil Square!",bc_all,0x0ceedb;
+	sleep 30000;
+	mapannounce "ordeal_1-1","30 seconds left to start Devil Square!",bc_all,0x0ceedb;
+	sleep 30000;
+	mapannounce "ordeal_1-1","Devil Square has begun!",bc_all,0x0ceedb;
+	.active = true;
+	.mob = 75;
+	areamonster "ordeal_1-1",183,182,246,244,"[DS] SOLDIER SKELETON",1028,10,"Event_DevilSquare::Ondevildead";
+	areamonster "ordeal_1-1",183,182,246,244,"[DS] ORC ARCHER",1189,15,"Event_DevilSquare::Ondevildead";
+	areamonster "ordeal_1-1",183,182,246,244,"[DS] SANDMAN",1165,10,"Event_DevilSquare::Ondevildead";
+	areamonster "ordeal_1-1",183,182,246,244,"[DS] ARCHER SKELETON",1016,15,"Event_DevilSquare::Ondevildead";
+	areamonster "ordeal_1-1",183,182,246,244,"[DS] MINOROUS",1149,15,"Event_DevilSquare::Ondevildead";
+	areamonster "ordeal_1-1",183,182,246,244,"[DS] REQUIEM",1164,10,"Event_DevilSquare::Ondevildead";
+	donpcevent "Event_DevilSquare::OnCheck";
+	end;
+
+Ondevildead:
+
+	if(!$@end_event && .active) {
+		.mob--;
+		if(.mob == 25 || .mob == 5)
+			mapannounce "ordeal_1-1","There are "+.mob+" monsters alive.",bc_all,0x0ceedb;
+		else if(!.mob)
+			donpcevent "Event_DevilSquare::OnRonda2";
+	}
+	end;
+
+OnRonda2:
+
+	mapannounce "ordeal_1-1","The second wave will be here in 30 seconds. Be prepared!",bc_all,0x0ceedb;
+	sleep 30000;
+	mapannounce "ordeal_1-1","The second wave is now here!",bc_all,0x0ceedb;
+	.mob = 70;
+	areamonster "ordeal_1-1",183,182,246,244,"[DS] GARGOYLE",1253,15,"Event_DevilSquare::Ondevildead2";
+	areamonster "ordeal_1-1",183,182,246,244,"[DS] ALARM",1193,10,"Event_DevilSquare::Ondevildead2";
+	areamonster "ordeal_1-1",183,182,246,244,"[DS] HIGH ORC",1213,10,"Event_DevilSquare::Ondevildead2";
+	areamonster "ordeal_1-1",183,182,246,244,"[DS] INJUSTICE",1257,10,"Event_DevilSquare::Ondevildead2";
+	areamonster "ordeal_1-1",183,182,246,244,"[DS] MIMIC",1191,15,"Event_DevilSquare::Ondevildead2";
+	areamonster "ordeal_1-1",183,182,246,244,"[DS] WRAITH",1192,10,"Event_DevilSquare::Ondevildead2";
+	end;
+
+Ondevildead2:
+
+	if(!$@end_event && .active) {
+		.mob--;
+		if(.mob == 25 || .mob == 5)
+			mapannounce "ordeal_1-1","There are "+.mob+" monsters alive.",bc_all,0x0ceedb;
+		else if(!.mob)
+			donpcevent "Event_DevilSquare::OnRonda3";
+	}
+	end;
+
+OnRonda3:
+
+	mapannounce "ordeal_1-1","The third wave will be here in 30 seconds. Be prepared!",bc_all,0x0ceedb;
+	sleep 30000;
+	mapannounce "ordeal_1-1","The third wave is now here!",bc_all,0x0ceedb;
+	.mob = 58;
+	areamonster "ordeal_1-1",183,182,246,244,"[DS] ANOLIAN",1206,15,"Event_DevilSquare::Ondevildead3";
+	areamonster "ordeal_1-1",183,182,246,244,"[DS] WANDERER",1208,15,"Event_DevilSquare::Ondevildead3";
+	areamonster "ordeal_1-1",183,182,246,244,"[DS] DEVIRUCHI",1109,10,"Event_DevilSquare::Ondevildead3";
+	areamonster "ordeal_1-1",183,182,246,244,"[DS] JOKER",1131,15,"Event_DevilSquare::Ondevildead3";
+	areamonster "ordeal_1-1",183,182,246,244,"[DS] MOONLIGHT",1150,2,"Event_DevilSquare::Ondevildead3";
+	areamonster "ordeal_1-1",183,182,246,244,"[DS] DARK ILLUSION",1302,1,"Event_DevilSquare::Ondevildead3";
+	end;
+
+Ondevildead3:
+
+	if(!$@end_event && .active) {
+		.mob--;
+		if(.mob == 25 || .mob == 5)
+			mapannounce "ordeal_1-1","There are "+.mob+" monsters alive.",bc_all,0x0ceedb;
+		else if(!.mob)
+			donpcevent "Event_DevilSquare::OnRonda4";
+	}
+	end;
+
+OnRonda4:
+
+	mapannounce "ordeal_1-1","In 20 seconds the chests will appear! Good luck!",bc_all,0x0ceedb;
+	sleep 15000;
+	mapannounce "ordeal_1-1","Remember to use @autoloot!",bc_all,0x0ceedb;
+	sleep 5000;
+	mapannounce "ordeal_1-1","The chests are now here!",bc_all,0x0ceedb;
+	.mob = 10;
+	for(.@i = 1;.@i <= 8;.@i++)
+		monster "ordeal_1-1",228 + 3*.@i,253 - 3*.@i,"Treasure Box",1320 + 4*.@i,1,"Event_DevilSquare::Onboxdead";
+	monster "ordeal_1-1",249,241,"Treasure Box",1356,1,"Event_DevilSquare::Onboxdead";
+	monster "ordeal_1-1",240,249,"Treasure Box",1360,1,"Event_DevilSquare::Onboxdead";
+	sleep 100000;
+	if(.mob)
+		donpcevent "Event_DevilSquare::OnEnd";
+	end;
+
+Onboxdead:
+
+	if(!$@end_event && .active) {
+		.mob--;
+		.@n = 10 - .mob;
+		mapannounce "ordeal_1-1",strcharinfo(0)+" has open a chest. ("+.@n+"/10)",bc_all,0x0ceedb;
+		if(!.mob)
+			donpcevent "Event_DevilSquare::OnEnd";
+	}
+	end;
+
+OnCheck:
+
+	while(!$@end_event && .active && !.@end) {
+		sleep 30000;
+		if(!$@end_event) {
+			.@map  = getmapusers("ordeal_1-1");
+			.@n    = 0;
+			if(.@map) {
+				.@size = getmapunits(BL_PC,"ordeal_1-1",.@players$);
+				for(.@i = 0;.@i < .@size;.@i++) {
+					if(readparam(HP,.@players$[.@i]) <= 0)
+						.@n++;
+				}
+			}
+			if(.@n == .@map) {
+				mapannounce "ordeal_1-1","Nobody is alive! The event has ended.",bc_all,0x0ceedb;
+				.@end = true;
+			}
+		}
+	}
+	if(.active)
+		donpcevent "Event_DevilSquare::OnEnd";
+	end;
+
+OnEnd:
+
+	sleep 2000;
+	killmonsterall "ordeal_1-1";
+	cleanmap "ordeal_1-1";
+	enablenpc "ord11-12";
+	.active = false;
+	awake "Event_DevilSquare";
+	.mob = 0;
+	donpcevent "Events::OnEndEvent";
+	end;
+
+}
+
+// Credits to Keale.
+prontera,155,227,4	script	Clucker	4_NFCOCK,{
+
+	if(.active) {
+		specialeffect2 EF_HIT3;
+		switch(rand(16)) {
+		case 0: npctalk "Cluckers : CLUUUUUUCK!!!"; unitkill getcharid(3); skilleffect "NPC_SELFDESTRUCTION",1; emotion ET_HUK; break;
+		case 1: npctalk "Cluckers : Cluuuuuck!~"; break;
+		case 2: unitkill getcharid(3); skilleffect "NPC_SELFDESTRUCTION",1; break;
+		case 3: sc_start SC_Freeze,10000,0; break;
+		case 4: npctalk "Cluckers : CLUUUUUUUUUCK!!!"; unitkill getcharid(3); skilleffect "NPC_SELFDESTRUCTION",1; emotion ET_HUK; break;
+		case 5: sc_start SC_Sleep,10000,0; break;
+		case 6: sc_start SC_Stone,10000,0; emotion ET_KIK; break;
+		case 7: npctalk "Cluckers : CLUUUUUUCK!!!"; unitkill getcharid(3); skilleffect "NPC_SELFDESTRUCTION",1; emotion ET_HUK; break;
+		case 8: npctalk "Cluckers : Cluck! CLUUUCK!!"; unitkill getcharid(3); skilleffect "NPC_SELFDESTRUCTION",1; emotion ET_HUK; break;
+		case 9: sc_start SC_Stun,10000,0; break;
+		case 10: sc_start SC_Sleep,10000,0; emotion ET_KIK; break;
+		case 11: npctalk "Cluckers : Cluck! Cluck!"; break;
+		case 12: sc_start SC_Stun,10000,0; break;
+		case 13: unitkill getcharid(3); skilleffect "NPC_SELFDESTRUCTION",1; break;
+		case 14: npctalk "Clucker : Cluck! Cluck!"; pushpc rand(8),rand(5,8); break;
+		default:
+			if(rand(50) < 4) {
+				npctalk "Clucker : WOF! ......";
+				specialeffect2 EF_SPHERE;
+				announce strcharinfo(0)+" got the prize of the chicken!",bc_all,0x0ceedb;
+				@event_prize = 6;
+				doevent "Events::OnPrize";
+				.active = false;
+				sleep 800;
+				awake strnpcinfo(0);
+			} else {
+				npctalk "Clucker : CLUUUUUUCK!!!";
+				unitkill getcharid(3); skilleffect "NPC_SELFDESTRUCTION",1;
+			}
+			break;
+		}
+	}
+	end;
+
+OnStart:
+
+	announce "The Cluckers Event will begin in 3 minutes in Prontera.",bc_all,0x0ceedb;
+	sleep 60000;
+	announce "The Cluckers Event will begin in 2 minutes in Prontera.",bc_all,0x0ceedb;
+	sleep 60000;
+	announce "The Cluckers event will begin in 1 minute!",bc_all,0x0ceedb;
+	sleep 20000;
+	announce "Come behind the well if you want to play with this crazy chicken!",bc_all,0x0ceedb;
+	sleep 20000;
+	mapannounce "prontera","It looks like the chicken has eaten some valuable object...",bc_all,0x0ceedb;
+	sleep 10000;
+	mapannounce "prontera","Click on the chicken if you want to recover it. But be careful, the chicken has a lot of surprises.",bc_all,0x0ceedb;
+	sleep 10000;
+	mapannounce "prontera","Are you ready?! Here comes the chicken!",bc_all,0x0ceedb;
+	.@npc$ = strnpcinfo(0);
+	enablenpc .@npc$;
+	movenpc .@npc$,155,227;
+	.active = true;
+	.@speed = 150;
+	npcspeed .@speed;
+	while(.active && !$@end_event && .@time < 4*25) {
+		sleep 15000;
+		getmapxy .@m$,.@x0,.@y0,BL_NPC;
+		.@x1 = 155 + rand(-10,10);
+		.@y1 = 227 + rand(-10,10);
+		if(.@x0 != .@x1 || .@y0 != .@y1) {
+			npcwalkto .@x1,.@y1;
+			.@dis   = distance(.@x0,.@y0,.@x1,.@y1);
+			.@timer = .@speed + 200/.@dis;
+			while(.@dis-- && .active && !$@end_event) {
+				soundeffectall "kocot_foot"+(.@dis%2 + 1)+".wav",0,.@m$,.@x0 - 15,.@y0 - 15,.@x0 + 15,.@y0 + 15;
+				sleep .@timer;
+			}
+		}
+		.@time++;
+	}
+	mapannounce "prontera","The chicken is now gone! Thank you for your participation.",bc_all,0x0ceedb;
+	npcstop;
+	disablenpc .@npc$;
+	donpcevent "Events::OnEndEvent";
+	end;
+
+OnInit:
+
+	disablenpc strnpcinfo(0);
+	end;
+
+}
+
+
+
+// set mapflags
+guild_vs2	mapflag	mf_nomount
+quiz_02	mapflag	mf_nomount
+pvp_y_1-2	mapflag	mf_nomount

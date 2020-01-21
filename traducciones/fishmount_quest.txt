@@ -1,0 +1,39 @@
+cmd_fild02,90,118,3	script	Marie#schall	4_F_STARFISHGIRL,{
+L_Speak:
+	mes "[Marie]";
+	if(checkquest(61500) == 2) {
+		mes "In deep water, you have your fish mounting, no worries!";
+	} else if(checkquest(61500) == 1 && countitem(518) > 14 && countitem(526) > 14) {
+		completequest 61500;
+		delitem 518,15;
+		delitem 526,15;
+		mes "Congrats!!";
+		mes "I asked you to find Calliope.","You have to pass through water... In deep water, ^0000FFVIT impacts the length of breathbar^000000.";
+		next;
+		mes "[Marie]";
+		mes "She is like a mermaid and she on the beach near this island.","Good luck!";
+	} else {
+		mes "Hey, hello ! What are you going to do?","You don't think to go under water without appropriate protections?!";
+		next;
+		select("Hmm, yes why?");
+		mes "[Marie]";
+		mes "Crazy human!! These waters are very deep, way deeper than these you encounter before.","You'll be able to breathe only a few time.";
+		next;
+		select("Whew! What I'm supposed to do then?");
+		mes "[Marie]";
+		mes "Fortunaly I'm here, to go under water, you have to be with a legendary monster : ^3399ffCoelacanth^000000";
+		next;
+		mes "[Marie]";
+		mes "And I know where it is now; it's the perfect opportunity to tame one!";
+		next;
+		if(select("Tame a Coelacanth:I don't need your help") == 1) {
+			mes "[Marie]";
+			mes "So, first of all bring me ^FFa00015 Honey^000000 and ^FFa00015 Royal Jelly^000000 to lure it.","During your previous missions, you've got to find a few on Luciola Vespa.";
+			setquest 61500;
+		}
+	}
+	close;
+
+OnInit:
+questinfo 61500,QTYPE_QUEST2,0,1;
+}	

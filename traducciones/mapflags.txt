@@ -1,0 +1,8 @@
+// custom mapflags
+// Example :
+prontera	mapflag	allow_storage
+prontera	mapflag	allow_gstorage
+prontera	mapflag	allow_woe_items
+prontera	mapflag	allow_pvp_items
+prontera	mapflag	allow_bg_items
+prontera	mapflag	mvp

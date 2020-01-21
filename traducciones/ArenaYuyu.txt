@@ -1,0 +1,742 @@
+prontera.gat,141,226,5	script	Yambala::MvPArenaWarpIn	768,{
+	if(class == 0) goto L_lnoob;
+	if(readparam(11)<50) goto L_lnoob;
+
+	mes "[Yambala]";
+	mes "Do you want me to send you to the MvP arena lobby?";
+	next;
+	menu "Yes, please...",L_warpme,"ehh...I'm too afraid!",L_stay;
+L_lnoob:
+	mes "[Yambala]";
+	mes "Sorry, but you're not strong enough to get in the MvP arena. Please try again later when you leveled some.";
+	close;
+L_warpme:
+	if(Zeny > 100000) {
+	set Zeny, Zeny - 100000;
+	warp "new_5-2",	27,	172;	close;
+	close;
+	} else { 
+	mes "You dont have money";
+	close;
+	}
+L_stay:
+	mes "[Yambala]";
+	mes "You must be too low level....";
+	close;
+}
+//
+new_5-2,21,188,4	script	MvP Guard 1	78,{
+	callfunc "F_MvPGuard","guild_vs1.gat",1;
+}
+
+new_5-2,23,188,4	script	MvP Guard 2	78,{
+	callfunc "F_MvPGuard","guild_vs2.gat",2;
+}
+
+new_5-2,25,188,4	script	MvP Guard 3	78,{
+	callfunc "F_MvPGuard","guild_vs4.gat",3;
+}
+
+
+function	script	F_MvPGuard	{
+	mes "[MvP Guard]";
+	mes "Do you want me to send you to MvP Arena " + getarg(1) + "?";
+	mes "If you die within, and release to town, your MVP will be free to kill by anyone.";
+	next;
+	menu "Yes, please...",L_warpme,"ehh...I'm too afraid!",L_stay;
+L_warpme:
+	// clean code
+	if (getarraysize($avmvp_mapusers$)>0) {
+		for (set .@i,0; .@i<getarraysize($avmvp_mapusers$); set .@i, .@i+1 ) {
+			getmapxy(@mapname$,@mapx,@mapy,0,$avmvp_mapusers$[.@i]);
+
+			// if this char is not in an MVP arena, get rid of it. we don't need it.
+			if (@mapname$!="guild_vs1" && @mapname$!="guild_vs2" && @mapname$!="guild_vs4") {
+				deletearray $avmvp_mapusers$[.@i],1;
+				if (getarraysize($avmvp_mapusers$)!=.@i) set .@i, .@i-1;
+			}
+
+			// this character isn't trying to go into the same mvp arena as their other character
+		}
+	}
+	// check code
+	if (getarraysize($avmvp_mapusers$)>0) {
+		query_sql "SELECT `last_ip` FROM `login` WHERE `account_id` = '"+escape_sql(getcharid(3))+"'", @avsqlip2$;
+		for (set .@i,0; .@i<getarraysize($avmvp_mapusers$); set .@i, .@i+1 ) {
+			query_sql "SELECT `last_ip` FROM `login` WHERE `account_id` = '"+escape_sql(getcharid(3,$avmvp_mapusers$[.@i]))+"'", @avsqlip1$;
+			// same ip
+			if (@avsqlip1$==@avsqlip2$) {
+				getmapxy(@mapname$,@mapx,@mapy,0,$avmvp_mapusers$[.@i]);
+				if (@mapname$+".gat"!=getarg(0)) {
+					 set @specialavmvpflag$,@mapname$+".gat";
+				}
+				// they're flagged, they've got someone in an MVP arena and they're trying to warp in
+				
+				if (@specialavmvpflag$!="") {
+					// AND it's the same one as they're going into
+					if (@specialavmvpflag$==getarg(0)) {
+						mes "[MvP Guard]";
+						mes "I'm sorry, you already have a character named "+$avmvp_mapusers$[.@i]+" in the MVP arena.";
+						mes "When that character leaves, you can enter.";
+						close;
+					}
+				// no flag, they go away
+				} else {
+					mes "[MvP Guard]";
+					mes "I'm sorry, you already have a character named "+$avmvp_mapusers$[.@i]+" in the MVP arena.";
+					mes "When that character leaves, you can enter.";
+					close;
+				}
+			}
+		}		
+	}
+	// add to db
+	set $avmvp_mapusers$[getarraysize($avmvp_mapusers$)],strcharinfo(0);
+	if (@TEMP == 0)	warp getarg(0),	91,	49;
+	if (@TEMP == 1)	warp getarg(0),	8,	49;
+	if (@TEMP == 2)	warp getarg(0),	49,	8;
+	close;
+L_stay:
+	mes "[MvP Guard]";
+	mes "You must be too low level or something...";
+	close;
+}
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+guild_vs1.gat,49,91,4	script	MvP Helper 1	103,{
+	//if($CanSpawn & 1) goto L_ok;
+	//mes "[MVP Helper]";
+	//mes "I cannot spawn that fast.... my power is draining.";
+	//mes "Would you like to leave?";
+	//menu "Yes!", L_letmeleave, "Nah.", L_Stay;
+
+//L_Stay:
+	//close;
+//L_ok:
+	//if(mobcount("guild_vs1.gat","guild_vs1.gat") > 3) goto L_nono; // Not working.
+	//set $CanSpawn, $CanSpawn ^ 1; //turn the first bit off
+	callfunc "F_MvPHelper","guild_vs1.gat";
+	end;
+L_nono:
+	mes "[MvP Helper]";
+	mes "There's too many monsters";
+	close;
+}
+guild_vs2.gat,49,91,4	script	MvP Helper 2	103,{
+	//if($CanSpawn & 2) goto L_ok;
+	//mes "[MVP Helper]";
+	//mes "I cannot spawn that fast.... my power is draining.";
+	//mes "Would you like to leave?";
+	//menu "Yes!", L_letmeleave, "Nah.", L_Stay;
+
+//L_Stay:
+	//close;
+//L_ok:
+	//if(mobcount("guild_vs2.gat","guild_vs2.gat") > 3) goto L_nono; // Not working.
+	//set $CanSpawn, $CanSpawn ^ 2; //turn the second bit off
+	callfunc "F_MvPHelper","guild_vs2.gat";
+	end;
+L_nono:
+	mes "[MvP Helper]";
+	mes "There's too many monsters";
+	close;
+}
+guild_vs4.gat,49,91,4	script	MvP Helper 3	103,{
+	//if($CanSpawn & 4) goto L_ok;
+	//mes "[MVP Helper]";
+	//mes "I cannot spawn that fast.... my power is draining.";
+	//mes "Would you like to leave?";
+	//menu "Yes!", L_letmeleave, "Nah.", L_Stay;
+
+//L_Stay:
+	//close;
+//L_ok:
+	//if(mobcount("guild_vs4.gat","guild_vs4.gat") > 3) goto L_nono; // Not working.
+	//set $CanSpawn, $CanSpawn ^ 4; //turn the third bit off
+	callfunc "F_MvPHelper","guild_vs4.gat";
+	end;
+L_nono:
+	mes "[MvP Helper]";
+	mes "There's too many monsters";
+	close;
+}
+
+
+
+
+function	script	F_MvPHelper	{
+	if(@price_osiris == 0)		set @price_osiris,900000;
+	if(@price_doppel == 0)		set @price_doppel,1700000;
+	if(@price_mistress == 0)	set @price_mistress,1650000;
+	if(@price_orc_hero == 0)	set @price_orc_hero,1050000;
+	if(@price_eddga == 0)		set @price_eddga,750000;
+	if(@price_garm == 0)		set @price_garm,1650000;
+	if(@price_maya == 0)		set @price_maya,1500000;
+	if(@price_moonlight == 0)	set @price_moonlight,750000;
+	if(@price_pharaoh == 0)		set @price_pharaoh,600000;
+	if(@price_dracula == 0)		set @price_dracula,1200000;
+	if(@price_phreeoni == 0)	set @price_phreeoni,1650000;
+	if(@price_orc_lord == 0)	set @price_orc_lord,1500000;
+	if(@price_dark_lord == 0)	set @price_dark_lord,1350000;
+	if(@price_dark_snake_lord == 0)	set @price_dark_snake_lord,600000;
+	if(@price_bacsojin == 0)	set @price_bacsojin,600000;
+	if(@price_stormy_knight == 0)	set @price_stormy_knight,2000000;
+	if(@price_turtle_general == 0)	set @price_turtle_general,2000000;
+	if(@price_drake == 0)		set @price_drake,1800000;
+	if(@price_samurai == 0)		set @price_samurai,900000;
+	if(@price_grimnir == 0)		set @price_grimnir,1800000;
+	if(@price_rsx == 0)		set @price_rsx,1500000;
+	if(@price_bapho == 0)		set @price_bapho,3000000;
+	if(@price_detale == 0)		set @price_detale,3000000;
+	//if(@price_golden_bug == 0)	set @price_golden_bug,2100000;
+	//if(@price_tao == 0)		set @price_tao,3000000;
+	//if(@price_thanatos == 0)  set @price_thanatos,2000000000;
+	//if(@price_vesper == 0)  set @price_vesper,2000000000;
+
+	if(@price_angeling == 0)	set @price_angeling,800000;
+	if(@price_archangeling == 0)	set @price_archangeling,400000;
+	if(@price_bloody_knight == 0)	set @price_bloody_knight,400000;
+	if(@price_chimera == 0)		set @price_chimera,400000;
+	if(@price_dragonfly == 0)	set @price_dragonfly,400000;
+	if(@price_eclipse == 0)		set @price_eclipse,400000;
+	if(@price_ghostring == 0)	set @price_ghostring,1000000;
+	if(@price_giant_whisper == 0)	set @price_giant_whisper,400000;
+	if(@price_goblin_leader == 0)	set @price_goblin_leader,400000;
+	if(@price_gryphon == 0)		set @price_gryphon,400000;
+	if(@price_mastering == 0)	set @price_mastering,400000;
+	if(@price_toad == 0)		set @price_toad,400000;
+	if(@price_vagabond_wolf == 0)	set @price_vagabond_wolf,400000;
+	if(@price_vocal == 0)		set @price_vocal,400000;
+	if(@price_dark_illusion == 0)	set @price_dark_illusion,400000;
+	//if(@price_werewolf == 0)	set @price_werewolf,1500000;
+
+
+L_start:
+	menu		"Summon an MvP for me",		L_summonmvp,
+			"Summon a Miniboss for me",	L_summonboss,
+			"Let me leave!",		L_letmeleave;
+L_summonmvp:
+	menu		"Grimnir ("+@price_grimnir+"z)",			L_grimnir,
+			"Osiris ("+@price_osiris+"z)",				L_osiris,
+			"Doppelganger ("+@price_doppel+"z)",			L_doppel,
+			"Mistress ("+@price_mistress+"z)",			L_mistress,
+			//"Golden Thief Bug ("+@price_golden_bug+"z)",		L_golden_bug,
+			"Orc Hero ("+@price_orc_hero+"z)",			L_orc_hero,
+			"Drake ("+@price_drake+"z)",				L_drake,
+			"Eddga ("+@price_eddga+"z)",				L_eddga,
+			"Garm ("+@price_garm+"z)",				L_garm,
+			"Maya ("+@price_maya+"z)",				L_maya,
+			"Moonlight ("+@price_moonlight+"z)",			L_moonlight,
+			"Pharaoh ("+@price_pharaoh+"z)",			L_pharaoh,
+			"Phreeoni ("+@price_phreeoni+"z)",			L_phreeoni,
+			"Stormy Knight ("+@price_stormy_knight+"z)",		L_stormy_knight,
+			"Orc Lord ("+@price_orc_lord+"z)",			L_orc_lord,
+			"Dark Lord ("+@price_dark_lord+"z)",			L_dark_lord,
+			"Dark Snake Lord ("+@price_dark_snake_lord+"z)",	L_dark_snake_lord,
+			"Turtle General ("+@price_turtle_general+"z)",		L_turtle_general,
+			"Incantation Samurai ("+@price_samurai+"z)",		L_samurai,
+			"Bacsojin ("+@price_bacsojin+"z)",			L_bacsojin,
+			"Dracula ("+@price_dracula+"z)",			L_dracula,
+			"Baphomet ("+@price_bapho+"z)",				L_bapho,
+			//"Tao Gunka ("+@price_tao+"z)",			L_tao,
+			"RSX 0806 ("+@price_rsx+"z)",			L_rsx,
+			"Detale ("+@price_detale+"z)",			L_detale;
+			//"Thanatos ("+@price_thanatos+"z)",			L_thanatos,
+			//"Vesper ("+@price_vesper+"z)",			L_vesper;
+L_summonboss:
+	menu		"Angeling ("+@price_angeling+"z)",			L_angeling,
+			"Arch-Angeling ("+@price_archangeling+"z)",		L_archangeling,
+			"Bloody Knight ("+@price_bloody_knight+"z)",		L_bloody_knight,
+			"Chimera ("+@price_chimera+"z)",			L_chimera,
+			"Dragonfly ("+@price_dragonfly+"z)",			L_dragonfly,
+			"Eclipse ("+@price_eclipse+"z)",			L_eclipse,
+			"Ghostring ("+@price_ghostring+"z)",			L_ghostring,
+			"Giant Whisper ("+@price_giant_whisper+"z)",		L_giant_whisper,
+			"Goblin Leader ("+@price_goblin_leader+"z)",		L_goblin_leader,
+			"Gryphon ("+@price_gryphon+"z)",			L_gryphon,
+			"Mastering ("+@price_mastering+"z)",			L_mastering,
+			"Toad ("+@price_toad+"z)",				L_toad,
+			"Vagabond wolf ("+@price_vagabond_wolf+"z)",		L_vagabond_wolf,
+			"Vocal ("+@price_vocal+"z)",				L_vocal,
+			//"Werewolf ("+@price_werewolf+"z)",			L_werewolf,
+			"Dark Illusion ("+@price_dark_illusion+"z)",		L_dark_illusion;
+
+L_bapho:
+	set @price,@price_bapho;
+	set @mobname$,"Baphomet";
+	set @mobid,1039;
+	set $bapho_count,$bapho_count+1;
+	if ($bapho_count > 2) goto L_toomany;
+	goto L_summon;
+L_osiris:
+	set @price,@price_osiris;
+	set @mobname$,"Osiris";
+	set @mobid,1038;
+	set $osiris_count,$osiris_count+1;
+	if ($osiris_count > 2) goto L_toomany;
+	goto L_summon;
+L_doppel:
+	set @price,@price_doppel;
+	set @mobname$,"Doppelganger";
+	set @mobid,1046;
+	set $doppel_count,$doppel_count+1;
+	if ($doppel_count > 2) goto L_toomany;
+	goto L_summon;
+L_mistress:
+	set @price,@price_mistress;
+	set @mobname$,"Mistress";
+	set @mobid,1059;
+	set $mistress_count,$mistress_count+1;
+	if ($mistress_count > 2) goto L_toomany;
+	goto L_summon;
+//L_golden_bug:
+	//set @price,@price_golden_bug;
+	//set @mobname$,"Golden Thief Bug";
+	//set @mobid,1086;
+	//set $goldenbug_count,$goldenbug_count+1;
+	//if ($goldenbug_count > 2) goto L_toomany;
+	//goto L_summon;
+L_orc_hero:
+	set @price,@price_orc_hero;
+	set @mobname$,"Orc Hero";
+	set @mobid,1087;
+	set $orchero_count,$orchero_count+1;
+	if ($orchero_count > 2) goto L_toomany;
+	goto L_summon;
+L_drake:
+	set @price,@price_drake;
+	set @mobname$,"Drake";
+	set @mobid,1112;
+	set $drake_count,$drake_count+1;
+	if ($drake_count > 2) goto L_toomany;
+	goto L_summon;
+L_eddga:
+	set @price,@price_eddga;
+	set @mobname$,"Eddga";
+	set @mobid,1115;
+	set $eddga_count,$eddga_count+1;
+	if ($eddga_count > 2) goto L_toomany;
+	goto L_summon;
+L_garm:
+	set @price,@price_garm;
+	set @mobname$,"Garm";
+	set @mobid,1252;
+	set $garm_count,$garm_count+1;
+	if ($garm_count > 2) goto L_toomany;
+	goto L_summon;
+L_maya:
+	set @price,@price_maya;
+	set @mobname$,"Maya";
+	set @mobid,1147;
+	set $maya_count,$maya_count+1;
+	if ($maya_count > 2) goto L_toomany;
+	goto L_summon;
+L_moonlight:
+	set @price,@price_moonlight;
+	set @mobname$,"Moonlight";
+	set @mobid,1150;
+	set $moonlight_count,$moonlight_count+1;
+	if ($moonlight_count > 2) goto L_toomany;
+	goto L_summon;
+L_pharaoh:
+	set @price,@price_pharaoh;
+	set @mobname$,"Pharaoh";
+	set @mobid,1157;
+	set $pharaoh_count,$pharaoh_count+1;
+	if ($pharaoh_count > 2) goto L_toomany;
+	goto L_summon;
+L_phreeoni:
+	set @price,@price_phreeoni;
+	set @mobname$,"Phreeoni";
+	set @mobid,1159;
+	set $phreeoni_count,$phreeoni_count+1;
+	if ($phreeoni_count > 2) goto L_toomany;
+	goto L_summon;
+L_orc_lord:
+	set @price,@price_orc_lord;
+	set @mobname$,"Orc Lord";
+	set @mobid,1190;
+	set $orclord_count,$orclord_count+1;
+	if ($orclord_count > 2) goto L_toomany;
+	goto L_summon;
+L_dark_lord:
+	set @price,@price_dark_lord;
+	set @mobname$,"Dark Lord";
+	set @mobid,1272;
+	set $darklord_count,$darklord_count+1;
+	if ($darklord_count > 2) goto L_toomany;
+	goto L_summon;
+L_turtle_general:
+	set @price,@price_turtle_general;
+	set @mobname$,"Turtle General";
+	set @mobid,1312;
+	set $turtlegeneral_count,$turtlegeneral_count+1;
+	if ($turtlegeneral_count > 2) goto L_toomany;
+	goto L_summon;
+L_samurai:
+	set @price,@price_samurai;
+	set @mobname$,"Incantation Samurai";
+	set @mobid,1492;
+	set $samurai_count,$samurai_count+1;
+	if ($samurai_count > 2) goto L_toomany;
+	goto L_summon;
+L_grimnir:
+	set @price,@price_grimnir;
+	set @mobname$,"Grimnir";
+	set @mobid,2910;
+	set $grimnir_count,$grimnir_count+1;
+	if ($grimnir_count > 2) goto L_toomany;
+	goto L_summon;
+L_stormy_knight:
+	set @price,@price_stormy_knight;
+	set @mobname$,"Stormy Knight";
+	set @mobid,1251;
+	set $stormy_count,$stormy_count+1;
+	if ($stormy_count > 2) goto L_toomany;
+	goto L_summon;
+L_dracula:
+	set @price,@price_dracula;
+	set @mobname$,"Dracula";
+	set @mobid,1389;
+	set $dracula_count,$dracula_count+1;
+	if ($dracula_count > 2) goto L_toomany;
+	goto L_summon;
+L_dark_snake_lord:
+	set @price,@price_dark_snake_lord;
+	set @mobname$,"Dark Snake Lord";
+	set @mobid,1418;
+	set $darksnakelord_count,$darksnakelord_count+1;
+	if ($darksnakelord_count > 2) goto L_toomany;
+	goto L_summon;
+L_bacsojin:
+	set @price,@price_bacsojin;
+	set @mobname$,"Bacsojin";
+	set @mobid,1630;
+	set $bacsojin_count,$bacsojin_count+1;
+	if ($bacsojin_count > 2) goto L_toomany;
+	goto L_summon;
+//L_tao:
+	//set @price,@price_tao;
+	//set @mobname$,"Tao Gunka";
+	//set @mobid,1583;
+	//set $tao_count,$tao_count+1;
+	//if ($tao_count > 2) goto L_toomany;
+	//goto L_summon;
+L_rsx:
+	set @price,@price_rsx;
+	set @mobname$,"RSX 0806";
+	set @mobid,1623;
+	set $rsx_count,$rsx_count+1;
+	if ($rsx_count > 2) goto L_toomany;
+	goto L_summon;
+L_detale:
+	set @price,@price_detale;
+	set @mobname$,"Detale";
+	set @mobid,1719;
+	set $detale_count,$detale_count+1;
+	if ($detale_count > 2) goto L_toomany;
+	goto L_summon;
+
+//L_thanatos:
+	//set @price,@price_thanatos;
+	//set @mobname$,"Thanatos";
+	//set @mobid,1708;
+	//set $thanatos_count,$thanatos_count+1;
+	//if ($thanatos_count > 2) goto L_toomany;
+	//goto L_summon;
+	
+//L_vesper:
+	//set @price,@price_vesper;
+	//set @mobname$,"Vesper";
+	//set @mobid,1685;
+	//set $vesper_count,$vesper_count+1;
+	//if ($vesper_count > 2) goto L_toomany;
+	//goto L_summon;
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////mini-boss
+
+L_angeling:
+	set @price,@price_angeling;
+	set @mobname$,"Angeling";
+	set @mobid,1096;
+	set $angeling_count,$angeling_count+1;
+	if ($angeling_count > 2) goto L_toomany;
+	goto L_summon;
+L_archangeling:
+	set @price,@price_archangeling;
+	set @mobname$,"Archangeling";
+	set @mobid,1388;
+	set $archangeling_count,$archangeling_count+1;
+	if ($archangeling_count > 2) goto L_toomany;
+	goto L_summon;
+L_bloody_knight:
+	set @price,@price_bloody_knight;
+	set @mobname$,"Bloody Knight";
+	set @mobid,1268;
+	set $bloodyknight_count,$bloodyknight_count+1;
+	if ($bloodyknight_count > 2) goto L_toomany;
+	goto L_summon;
+L_chimera:
+	set @price,@price_chimera;
+	set @mobname$,"Chimera";
+	set @mobid,1283;
+	set $chimera_count,$chimera_count+1;
+	if ($chimera_count > 2) goto L_toomany;
+	goto L_summon;
+L_dragonfly:
+	set @price,@price_dragonfly;
+	set @mobname$,"Dragonfly";
+	set @mobid,1091;
+	set $dragonfly_count,$dragonfly_count+1;
+	if ($dragonfly_count > 2) goto L_toomany;
+	goto L_summon;
+L_eclipse:
+	set @price,@price_eclipse;
+	set @mobname$,"Eclipse";
+	set @mobid,1093;
+	set $eclipse_count,$eclipse_count+1;
+	if ($eclipse_count > 2) goto L_toomany;
+	goto L_summon;
+L_ghostring:
+	set @price,@price_ghostring;
+	set @mobname$,"Ghostring";
+	set @mobid,1120;
+	set $ghostring_count,$ghostring_count+1;
+	if ($ghostring_count > 2) goto L_toomany;
+	goto L_summon;
+L_giant_whisper:
+	set @price,@price_giant_whisper;
+	set @mobname$,"Giant Whisper";
+	set @mobid,1186;
+	set $giantwhisper_count,$giantwhisper_count+1;
+	if ($giantwhisper_count > 2) goto L_toomany;
+	goto L_summon;
+L_goblin_leader:
+	set @price,@price_goblin_leader;
+	set @mobname$,"Goblin Leader";
+	set @mobid,1299;
+	set $goblinleader_count,$goblinleader_count+1;
+	if ($goblinleader_count > 2) goto L_toomany;
+	goto L_summon;
+L_gryphon:
+	set @price,@price_gryphon;
+	set @mobname$,"Gryphon";
+	set @mobid,1259;
+	set $gryphon_count,$gryphon_count+1;
+	if ($gryphon_count > 2) goto L_toomany;
+	goto L_summon;
+L_mastering:
+	set @price,@price_mastering;
+	set @mobname$,"Mastering";
+	set @mobid,1090;
+	set $mastering_count,$mastering_count+1;
+	if ($mastering_count > 2) goto L_toomany;
+	goto L_summon;
+L_toad:
+	set @price,@price_toad;
+	set @mobname$,"Toad";
+	set @mobid,1089;
+	set $toad_count,$toad_count+1;
+	if ($toad_count > 2) goto L_toomany;
+	goto L_summon;
+L_vagabond_wolf:
+	set @price,@price_vagabond_wolf;
+	set @mobname$,"Vagabond Wolf";
+	set @mobid,1092;
+	set $vagabond_wolf_count,$vagabond_wolf_count+1;
+	if ($vagabond_wolf_count > 2) goto L_toomany;
+	goto L_summon;
+L_vocal:
+	set @price,@price_vocal;
+	set @mobname$,"Vocal";
+	set @mobid,1088;
+	set $vocal_count,$vocal_count+1;
+	if ($vocal_count > 2) goto L_toomany;
+	goto L_summon;
+//L_werewolf:
+	//set @price,@price_werewolf;
+	//set @mobname$,"Werewolf";
+	//set @mobid,1022;
+	//set $werewolf_count,$werewolf_count+1;
+	//if ($werewolf_count > 2) goto L_toomany;
+	//goto L_summon;
+L_dark_illusion:
+	set @price,@price_dark_illusion;
+	set @mobname$,"Dark Illusion";
+	set @mobid,1302;
+	set $darkillusion_count,$darkillusion_count+1;
+	if ($darkillusion_count > 2) goto L_toomany;
+	goto L_summon;
+
+L_NoMoney:
+	mes "[MvP Helper]";
+	mes "You need more zeny to summon that, sorry.";
+	close;
+L_summon:	
+	if(Zeny < @price) goto L_NoMoney;
+	set Zeny,Zeny-@price;
+	monster getarg(0),50,49,@mobname$,@mobid,1;
+	if (Sex==1) goto L_male;
+	announce strcharinfo(0) + " summoned a " + @mobname$ + ", only she is allowed to attack it!", 17;
+	close;
+L_male:
+	announce strcharinfo(0) + " summoned a " + @mobname$ + ", only he is allowed to attack it!", 17;
+	close;
+
+L_letmeleave:
+	warp "new_5-2",	27,	175;
+	end;
+L_toomany:
+	mes("Too many " + @mobname$ + "s have been summoned the past 20 minutes.");
+	mes("Please try again in 20 minutes.");
+	close;
+}
+
+
+
+
+
+
+
+
+-	script	CheckRooms	-1,{
+OnInit:
+OnMinute00:
+OnMinute20:
+OnMinute40:
+	set $bapho_count,0;
+	set $osiris_count,0;
+	set $doppel_count,0;
+	set $mistress_count,0;
+	//set $goldenbug_count,0;
+	set $orchero_count,0;
+	set $drake_count,0;
+	set $eddga_count,0;
+	set $garm_count,0;
+	set $maya_count,0;
+	set $moonlight_count,0;
+	set $pharaoh_count,0;
+	set $phreeoni_count,0;
+	set $orclord_count,0;
+	set $darklord_count,0;
+	set $turtlegeneral_count,0;
+	set $samurai_count,0;
+	set $grimnir_count,0;
+	//set $tao_count,0;
+	set $rsx_count,0;
+	set $detale_count,0;
+	set $stormy_count,0;
+	set $dracula_count,0;
+	set $darksnakelord_count,0;
+	set $bacsojin_count,0;
+	set $angeling_count,0;
+	set $archangeling_count,0;
+	set $bloodyknight_count,0;
+	set $chimera_count,0;
+	set $dragonfly_count,0;
+	set $eclipse_count,0;
+	set $ghostring_count,0;
+	set $giantwhisper_count,0;
+	set $goblinleader_count,0;
+	set $gryphon_count,0;
+	set $mastering_count,0;
+	set $toad_count,0;
+	set $vagabond_wolf_count,0;
+	set $vocal_count,0;
+	//set $werewolf_count,0;
+	set $darkillusion_count,0;
+OnMinute01:
+OnMinute02:
+OnMinute03:
+OnMinute04:
+OnMinute05:
+OnMinute06:
+OnMinute07:
+OnMinute08:
+OnMinute09:
+OnMinute10:
+OnMinute11:
+OnMinute12:
+OnMinute13:
+OnMinute14:
+OnMinute15:
+OnMinute16:
+OnMinute17:
+OnMinute18:
+OnMinute19:
+OnMinute21:
+OnMinute22:
+OnMinute23:
+OnMinute24:
+OnMinute25:
+OnMinute26:
+OnMinute27:
+OnMinute28:
+OnMinute29:
+OnMinute30:
+OnMinute31:
+OnMinute32:
+OnMinute33:
+OnMinute34:
+OnMinute35:
+OnMinute36:
+OnMinute37:
+OnMinute38:
+OnMinute39:
+OnMinute41:
+OnMinute42:
+OnMinute43:
+OnMinute44:
+OnMinute45:
+OnMinute46:
+OnMinute47:
+OnMinute48:
+OnMinute49:
+OnMinute50:
+OnMinute51:
+OnMinute52:
+OnMinute53:
+OnMinute54:
+OnMinute55:
+OnMinute56:
+OnMinute57:
+OnMinute58:
+OnMinute59:
+	if (playerattached() == 0) end;
+L_Starto:
+ 	if (getmapusers("guild_vs1.gat") == 0 && mobcount("guild_vs1.gat","guild_vs1.gat") > 0) goto L_CheckThingy1;
+ 	if (getmapusers("guild_vs2.gat") == 0 && mobcount("guild_vs2.gat","guild_vs2.gat") > 0) goto L_CheckThingy2;
+ 	if (getmapusers("guild_vs4.gat") == 0 && mobcount("guild_vs4.gat","guild_vs4.gat") > 0) goto L_CheckThingy3;
+	close;
+L_CheckThingy1:
+	// er zijn geen users meer
+	killmonsterall "guild_vs1.gat";
+	goto L_starto;
+L_CheckThingy2:
+	// er zijn geen users meer
+	killmonsterall "guild_vs2.gat";
+	goto L_starto;
+L_CheckThingy3:
+	// er zijn geen users meer
+	killmonsterall "guild_vs4.gat";
+	goto L_starto;
+}
+payon.gat,126,230,3	duplicate(MvPArenaWarpIn)	Yambala#pay	768
+rachel.gat,120,97,7	duplicate(MvPArenaWarpIn)	Yambala#ra	768
+
+//new_5-2,27,172	warp	mvpwarp1	2,2,new_5-2,27,172
+
+new_5-2	mapflag	pvp	off
+new_5-2	mapflag	gvg	off
+guild_vs1	mapflag	pvp	off
+guild_vs2	mapflag	pvp	off
+guild_vs4	mapflag	pvp	off
+guild_vs1	mapflag	gvg	off
+guild_vs2	mapflag	gvg	off
+guild_vs4	mapflag	gvg	off

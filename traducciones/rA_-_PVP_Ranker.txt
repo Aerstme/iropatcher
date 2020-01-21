@@ -1,0 +1,265 @@
+
+/*
+CREATE TABLE IF NOT EXISTS `ero_pvp_rank` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `cid` INT(11) UNSIGNED NOT NULL DEFAULT '0',
+  `kill_cid` INT(11) UNSIGNED NOT NULL DEFAULT '0',
+  `map` NVARCHAR(30) NOT NULL DEFAULT '',
+  `time` DATETIME,
+  `year` SMALLINT(4) UNSIGNED NOT NULL DEFAULT '0',
+  `month` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0',
+  `day` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0',
+  `week` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM;
+*/
+
+
+
+/* -------- You can remove this part
+
+prontera,143,179,7	script	PvP Rank	866,{
+	doevent "pvp_rank_main::OnTalk";
+	end;
+	
+OnInit:
+	// Auto-generate
+	query_sql("CREATE TABLE IF NOT EXISTS `ero_pvp_rank` (`id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT, `cid` INT(11) UNSIGNED NOT NULL DEFAULT '0', `kill_cid` INT(11) UNSIGNED NOT NULL DEFAULT '0', `map` NVARCHAR(30) NOT NULL DEFAULT '', `time` DATETIME, `year` SMALLINT(4) UNSIGNED NOT NULL DEFAULT '0', `month` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0', `day` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0', `week` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0', PRIMARY KEY (`id`)) ENGINE=MyISAM");
+	waitingroom "[ PvP Rank ]",0;
+	end;
+	
+// OnInit:
+	sleep 1000;
+	.@cid_list_size = query_sql("SELECT `char_id` FROM `char` WHERE `char_id` > 1000", .@cid_list);
+	// query_sql("TRUNCATE `ero_pvp_rank`");
+	.@sql$ = "INSERT INTO `ero_pvp_rank` (`cid`,`kill_cid`,`time`) VALUES ";
+	for (.@total = 1; .@total <= 1000; .@total++) {
+		if (.@total && .@total % 20 == 0) {
+			if (.@sql$ != "") {
+				query_sql(.@sql$);
+				// consolemes(CONSOLEMES_INFO, "added "+(.@total-20)+" ~ "+.@total);
+			}
+			.@sql$ = "INSERT INTO `ero_pvp_rank` (`cid`,`kill_cid`,`time`) VALUES ";
+			.@i = 0;
+			sleep 1;
+		}
+		
+		do {
+			.@cid = .@cid_list[rand(.@cid_list_size)];
+			.@kill_cid = .@cid_list[rand(.@cid_list_size)];
+		} while (.@cid == .@kill_cid);
+		.@map$ = F_Rand("prontera", "izlude", "payon", "morocc", "prt_fild01", "pay_fild04", "pay_dun02", "pay_fild02", "prt_fild02");
+		.@now$ = sprintf("2019-%02d-%02d %02d:%02d:%02d", rand(10), rand(31), rand(24), rand(60), rand(60));
+		.@sql$ += ((.@i > 0)? ",":"") + "("+.@cid+","+.@kill_cid+",'"+.@now$+"')";
+		.@i++;
+	}
+	query_sql("DELETE FROM `ero_pvp_rank` WHERE `time` = '0000-00-00 00:00:00'");
+	query_sql("UPDATE `ero_pvp_rank` SET `year` = YEAR(`time`), `month` = MONTH(`time`), `day` = DAYOFMONTH(`time`), `week` = WEEKOFYEAR(`time`) WHERE 1=1");
+	end;
+}
+
+------------- Until this part--------------*/
+
+
+prontera,143,179,7	script	PvP Rank	866,{
+	.@cid = getcharid(0);
+	while (1) {
+		switch(select(
+			"~ ^009900Mis estadisticas^000000.",
+			"~ Ranking global (Top "+.top_rank_global+").",
+			"~ Ranking mensual (Top "+.top_rank_monthly+").",
+			"~ Ranking semanal (Top "+.top_rank_weekly+").",
+			"~ Mis enemigos (Top "+.top_enemies+").",
+			"~ ^1E90FFInformación, leyenda y premios^000000.",
+			"Salir."
+		)) {
+			case 1:
+				mes "[ ^2e9c99Mis estadisticas^000000 ]";
+				query_sql("SELECT COUNT(`id`) FROM `ero_pvp_rank` WHERE `year` = "+.year+" AND`cid` = "+.@cid+" "+.disabled_map_query$+" GROUP BY `cid`", .@total_kill);
+				query_sql("SELECT COUNT(`id`) FROM `ero_pvp_rank` WHERE `year` = "+.year+" AND`kill_cid` = "+.@cid+" "+.disabled_map_query$+" GROUP BY `kill_cid`", .@total_death);
+				mes "Asesinatos Totales: " + "^FF0000[" + F_InsertComma(.@total_kill) +"]^000000";
+				mes "Muertes Totales: " + "^FF0000[" + F_InsertComma(.@total_death) +"]^000000";
+				mes " ";
+				query_sql("SELECT c.name FROM `ero_pvp_rank` rank INNER JOIN `char` c ON c.`char_id` = rank.`kill_cid` WHERE rank.`year` = "+.year+" AND rank.`cid` = "+.@cid+" "+.disabled_map_query$+" ORDER BY `id` DESC LIMIT 1", .@kill_name$);
+				query_sql("SELECT c.name FROM `ero_pvp_rank` rank INNER JOIN `char` c ON c.`char_id` = rank.`cid` WHERE rank.`year` = "+.year+" AND rank.`kill_cid` = "+.@cid+" "+.disabled_map_query$+" ORDER BY `id` DESC LIMIT 1", .@killed_name$);
+				mes "Último Asesinato: "+ "^0055FF" + .@kill_name$ + "^000000";
+				mes "Última Muerte: "+ "^FF8C00" + .@killed_name$ + "^000000";
+				break;
+			case 2:
+				mes "[ ^2e9c99Top "+.top_rank_global+" Global^000000 ]";
+				.@sql$ = "SELECT c.name, COUNT(rank.`id`) AS `total` FROM `ero_pvp_rank` rank INNER JOIN `char` c ON c.`char_id` = rank.`cid` WHERE rank.`year` = "+.year+"  "+.disabled_map_query$+" GROUP BY rank.`cid` ORDER BY `total` DESC LIMIT "+.top_rank_global;
+				.@size = query_sql(.@sql$, .@name$, .@total);
+				if (.@size) {
+					for (.@i = 0; .@i < .@size; .@i++)
+						mes "Top "+(.@i+1)+": ^0055FF"+.@name$[.@i]+"^000000 - ^FF0000"+.@total[.@i]+"^000000 asesinato(s).";
+				}
+				else {
+					mes "~ ^FF0000No hay registros^000000.";
+				}
+				break;
+			case 3:
+				.@month = select(
+					"~ Mes actual.",
+					"Enero.",
+					"Febrero.",
+					"Marzo.",
+					"Abril.",
+					"Mayo.",
+					"Junio.",
+					"Julio.",
+					"Agosto.",
+					"Septiembre.",
+					"Octubre.",
+					"Noviembre.",
+					"Diciembre."
+				) - 1;
+				if (.@month <= 0)
+					.@month = .month;
+				mes "[ ^2e9c99Top "+.top_rank_monthly+" Mensual - Mes #"+.@month+"^000000 ]";
+				.@sql$ = "SELECT c.name, COUNT(rank.`id`) AS `total` FROM `ero_pvp_rank` rank INNER JOIN `char` c ON c.`char_id` = rank.`cid` WHERE rank.`year` = "+.year+" AND rank.`month` = "+.@month+" "+.disabled_map_query$+" GROUP BY rank.`cid` ORDER BY `total` DESC LIMIT "+.top_rank_monthly;
+				.@size = query_sql(.@sql$, .@name$, .@total);
+				if (.@size) {
+					for (.@i = 0; .@i < .@size; .@i++)
+					mes "Top "+(.@i+1)+": ^0055FF"+.@name$[.@i]+"^000000 - ^FF0000"+.@total[.@i]+"^000000 asesinato(s).";
+				}
+				else {
+					mes "~ ^FF0000No hay registros^000000.";
+				}
+				break;
+			case 4:
+				mes "[ ^2e9c99Top "+.top_rank_weekly+" Semanal - Semana #"+.week+"^000000 ]";
+				.@sql$ = "SELECT c.name, COUNT(rank.`id`) AS `total` FROM `ero_pvp_rank` rank INNER JOIN `char` c ON c.`char_id` = rank.`cid` WHERE rank.`year` = "+.year+" AND rank.`week` = "+.week+" "+.disabled_map_query$+" GROUP BY rank.`cid` ORDER BY `total` DESC LIMIT "+.top_rank_weekly;
+				.@size = query_sql(.@sql$, .@name$, .@total);
+				if (.@size) {
+					for (.@i = 0; .@i < .@size; .@i++)
+						mes "Top "+(.@i+1)+": ^0055FF"+.@name$[.@i]+"^000000 - ^FF0000"+.@total[.@i]+"^000000 asesinato(s).";
+				}
+				else {
+					mes "~ ^FF0000No hay registros^000000.";
+				}
+				break;
+			case 5:
+				mes "[ ^2e9c99Mis enemigos Top "+.top_enemies+"^000000 ]";
+				.@sql$ = "SELECT c.name, COUNT(rank.`id`) AS `total` FROM `ero_pvp_rank` rank INNER JOIN `char` c ON c.`char_id` = rank.`cid` WHERE rank.`kill_cid` = "+.@cid+" "+.disabled_map_query$+" GROUP BY rank.`cid` ORDER BY `total` DESC LIMIT "+.top_enemies;
+				.@size = query_sql(.@sql$, .@name$, .@total);
+				if (.@size) {
+					for (.@i = 0; .@i < .@size; .@i++)
+						mes "Top "+(.@i+1)+": ^FF8C00"+.@name$[.@i]+"^000000 - ^FF0000"+.@total[.@i]+"^000000 muerte(s).";
+				}
+				else {
+					mes "~ ^FF0000No hay registros^000000.";
+				}
+				break;
+			case 6:
+				mes "[ ^2e9c99Información^000000 ]";
+				mes "¡Hola!";
+				mes "Conmigo podrás ver el registro de todos los ^0055FFasesinatos^000000 y todas las ^FF8C00muertes^000000 que sucedan en ^2e9c99Iridium RO^000000.";
+				next; 
+				mes "[ ^2e9c99Información^000000 ]";
+				mes "Es mi deber mostrar a los jugadores las estadisticas globables, mensuales y semanales.";
+				next;
+				mes "[ ^2e9c99Leyenda^000000 ]";
+				mes "^0055FFAsesinato^000000: Matar a otro player.";
+				mes "Ejemplo - Ranking Global (Top 25):";
+				mes "Top 1: ^0055FFCharon^000000 - ^FF000096^000000 asesinatos(s). Significa que Charon ha matado 96 players.";
+				next;
+				mes "[ ^2e9c99Leyenda^000000 ]";
+				mes "^FF8C00Muerte^000000: Sufrir la muerte por otro player.";
+				mes "Ejemplo - Mis Enemigos (Top 10):";
+				mes "Top 1: ^FF8C00Charon^000000 - ^FF000069^000000 muerte(s). Significa que Charon te ha matado 69 veces.";
+				next;	
+				mes "[ ^2e9c99Premios^000000 ]";
+				mes "Los premios se darán ^800080mensualmente^000000 a los jugadores TOP 3 del Ranking.";
+				mes "~ ^FF0000Nota: El Ranking contará todos los asesinatos y todas las muertes que sucedan en los mapas PK^000000.";
+				next;
+				mes "[ ^2e9c99Premios^000000 ]";
+				mes "======== Premios ========";
+				mes "^009900Primer lugar^000000: 45,000,000 Zeny + Aun no lo se";
+				mes " ";
+				mes "^00BFFFSegundo lugar^000000: 30,000,000 Zeny + Aun no lo se";
+				mes " ";
+				mes "^FF33E6Tercer lugar^000000: 15,000,000 Zeny + Aun no lo se";
+				next;
+				mes "[ ^2e9c99Premios^000000 ]";
+				mes "Cada fin de ^800080mes^000000, los ganadores recibirán sus premios vía RoDEX (Mail).";
+				mes "-----------------------------------";
+				mes "~ ^777777Demuestra quién eres en PvP^000000.";
+				break;
+			default:
+				close;
+		}
+		next;
+	}
+	close;
+	
+	OnInit:
+		query_sql("CREATE TABLE IF NOT EXISTS `ero_pvp_rank` (`id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT, `cid` INT(11) UNSIGNED NOT NULL DEFAULT '0', `kill_cid` INT(11) UNSIGNED NOT NULL DEFAULT '0', `map` NVARCHAR(30) NOT NULL DEFAULT '', `time` DATETIME, `year` SMALLINT(4) UNSIGNED NOT NULL DEFAULT '0', `month` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0', `day` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0', `week` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0', PRIMARY KEY (`id`)) ENGINE=MyISAM");
+		waitingroom "[ PvP Rank ]",0;
+		
+		// exclude gm lv1 and above.
+		.gm_level = 60;
+		// top kill rank are listed.
+		.top_rank_global = 25;
+		.top_rank_monthly = 25;
+		.top_rank_weekly = 25;
+		// top 10 enemy are listed.
+		.top_enemies = 10;
+		// top 3 every month are rewarded.
+		.top_rank_reward = 3;
+		
+		// disabled maps
+		setarray .disabled_map$, "06guild_%", "%cas_g%", "%@%"; // "prontera";
+		.disabled_map_size = getarraysize(.disabled_map$);
+		for (.@i = 0; .@i < .disabled_map_size; .@i++)
+			.disabled_map_query$ += "AND `map` NOT LIKE '"+escape_sql(.disabled_map$[.@i])+"' ";
+		
+	OnClock0000:
+		// assign rodex reward at 1st of every month.
+		if (.day == 1 && .month > 0) {
+			.@sql$ = "SELECT rank.cid, COUNT(rank.`id`) AS `total` FROM `ero_pvp_rank` rank INNER JOIN `char` c ON c.`char_id` = rank.`cid` WHERE rank.`year` = "+.year+" AND rank.`month` = "+.month+" "+.disabled_map_query$+" GROUP BY rank.`cid` ORDER BY `total` DESC LIMIT "+.top_rank_reward;
+			.@size = query_sql(.@sql$, .@cid, .@total);
+			for (.@i = 0; .@i < .@size; .@i++) {
+				.@rank = .@i+1;
+				switch (.@rank) {
+					case 1: // Top Rank 1 reward
+						.@zeny = 5000000;
+						setarray .@itemid, 501, 502, 503;
+						setarray .@amount, 100, 100, 100;
+						break;
+					case 2: // Top Rank 2 reward
+						.@zeny = 500000;
+						setarray .@itemid, 501, 502, 503;
+						setarray .@amount, 10, 10, 10;
+						break;
+					case 3: // Top Rank 3 reward
+						.@zeny = 5000;
+						setarray .@itemid, 501, 502, 503;
+						setarray .@amount, 1, 1, 1;
+						break;
+					default: continue;
+				}
+				mail .@cid[.@i], "SYSTEM", "**TOP #"+.@rank+" PVP RANK (MONTHLY) **", "Congratulation! You are rewarded for being Top #"+.@rank+" in the Monthly PVP Rank.", .@zeny, .@itemid, .@amount;
+			}
+		}
+		// update date info
+		query_sql("SELECT DAYOFMONTH(NOW()), MONTH(NOW()), YEAR(NOW()), WEEKOFYEAR(NOW())", .day, .month, .year, .week);
+		end;
+		
+	OnPCKillEvent:
+		.@killedrid = killedrid;
+		if (.@killedrid != getcharid(3) && (!.gm_level || getgmlevel() < .gm_level)) {
+			.@cid = getcharid(0);
+			.@map$ = strcharinfo(3);
+			if (attachrid(.@killedrid))
+				query_sql("INSERT INTO `ero_pvp_rank` (`cid`,`kill_cid`,`map`,`time`,`year`,`month`,`day`,`week`) VALUES ("+.@cid+","+getcharid(0)+",'"+escape_sql(.@map$)+"',NOW(),"+.year+","+.month+","+.day+","+.week+")");
+		}
+		end;
+}
+
+
+
+
+
+
+
+

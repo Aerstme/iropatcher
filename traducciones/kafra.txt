@@ -1,0 +1,89 @@
+prontera,148,191,5	script	Kafra	112,{
+	mes "[ ^2e9c99Kafra^000000 ]";
+	mes "¡Hola!";
+	mes "Conmigo puedes guardar tu posición en este mapa.";
+	mes "También podrás abrir tus ^009900stor^000000^1E90FFages^000000 y revisar los ^FF6133logs^000000 de tu ^FF6133guild storage^000000.";
+	next;
+	menu "~ Guardar punto.", M1, "~ ^009900Abrir storage^000000.", M2, "~ ^1E90FFAbrir guild storage^000000.", M3, "~ ^FF6133Logs guild storage^000000.", M4;
+	
+M1: mes "[ ^2e9c99Kafra^000000 ]";
+	mes "¿Estás seguro que quieres guardar tu posición en este mapa?";
+	if(select("~ ^009900Si, por favor^000000.:~ ^FF0000No, gracias^000000.")==2)close;
+		mes "^009900¡Listo!^000000";
+	getmapxy(@map$, @x, @y, BL_PC);
+	if(@map$ == "prontera"){
+		save @map$,155,189;
+		}
+	else if ( @map$ == "rachel"){
+		save @map$,129,101;
+		}
+	else if ( @map$ == "payon"){
+		save @map$,174,101;
+		}
+	else {
+		save @map$, @x, @y;
+		}
+	close;
+
+M2: mes "[ ^2e9c99Kafra^000000 ]";
+	mes "Abriendo ^009900storage^000000...";
+	close2;
+	openstorage;
+	end;
+
+M3: mes "[ ^2e9c99Kafra^000000 ]";
+	mes "Abriendo ^1E90FFguild storage^000000...";
+	close2;
+			switch(guildopenstorage()){
+				case GSTORAGE_OPEN: break;
+				case GSTORAGE_STORAGE_ALREADY_OPEN: mes "[ ^2e9c99Kafra^000000 ]";
+				mes "~ ^FF0000Necesitas cerrar el storage para que el guild storage se abra correctamente^000000."; break;
+				case GSTORAGE_ALREADY_OPEN: mes "[ ^2e9c99Kafra^000000 ]";
+				mes "~ ^FF0000Actualmente tienes el guild storage abierto^000000."; break;
+				case GSTORAGE_NO_GUILD: mes "[ ^2e9c99Kafra^000000 ]";
+				mes "~ ^FF0000Para abrir el guild storage debes formar parte de una guild^000000."; break;
+				case GSTORAGE_NO_STORAGE: mes "[ ^2e9c99Kafra^000000 ]"; 
+				mes "~ ^FF0000A la guild se le está imposibilitando abrir el guild storage^000000."; break;
+				case GSTORAGE_NO_PERMISSION: mes "[ ^2e9c99Kafra^000000 ]";
+				mes "~ ^FF0000Tu guild master debe darte el permiso correspondiente para poder abrir el guild storage^000000."; break;
+			}
+	end;
+	
+M4:
+	if(!getcharid(2)){
+				mes "[ ^2e9c99Kafra^000000 ]";
+				mes "~ ^FF0000Para revisar los logs del guild storage debes formar parte de una guild^000000.";
+				close;
+			}
+			if(!guild_has_permission(GUILD_PERM_STORAGE)){
+				mes "[ ^2e9c99Kafra^000000 ]";
+				mes "~ ^FF0000Tu guild master debe darte el permiso correspondiente para poder revisar los logs del guild storage^000000.";
+				close;
+			}
+			query_sql("SELECT `time`,`name`,`nameid`,`amount` FROM `guild_storage_log` WHERE `guild_id` = '" + getcharid(2) + "' order by `id` DESC", .@time$ ,.@name$,.@item_id,.@amount);
+			if(!.@item_id){
+				mes "[ ^2e9c99Kafra^000000 ]";
+				mes "~ ^FF0000No hay registros^000000.";
+				close;
+			}
+			dispbottom "==========================================================================",0xFFD64F;
+			dispbottom "=================== Logs guild storage =======================================",0xFFD64F;
+			dispbottom "==========================================================================",0xFFD64F;
+			for(.@i=0;.@i<getarraysize(.@item_id);.@i++)
+				dispbottom .@time$[.@i] + " Jugador [" + .@name$[.@i] + "] Item [" + getitemname(.@item_id[.@i]) + "] Cantidad(es) [" + .@amount[.@i] + "]",((.@amount[.@i] > 0)?0x2300FF:0xFF0000);
+			dispbottom "==========================================================================",0xFFD64F;
+end;
+
+OnInit:
+		waitingroom "[ Kafra ]",0;
+end;
+		
+	
+}
+
+
+
+// Duplicates
+//============================================================
+payon,179,112,4	duplicate(Kafra)	Kafra#pay	113
+rachel,140,115,4	duplicate(Kafra)	Kafra#rac	114
