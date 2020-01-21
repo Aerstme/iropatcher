@@ -27,10 +27,10 @@ menu	"Last Warp ^777777["+lastwarp$+"]^000000",-,
     	" ~ Towns",Towns,
     	" ~ Dungeons",Dungeons,
 	" ~ Fields",Fields,
-    	" ~ Castillos",Castles,
+    	" ~ Castles",Castles,
 //    	" ~ Guild Dungeons",Guild_Dungeons,
-    	" ~ Instancias",Instances,
-    	" ~ Areas Especiales",Special;
+    	" ~ Instances",Instances,
+    	" ~ Special Areas",Special;
 
 	if (lastwarp$ == "")
 		message strcharinfo(0),"You haven't warped anywhere yet.";
@@ -311,7 +311,7 @@ D29: Restrict("RE",7,8);
 	 Pick("","moc_pryd01","moc_pryd02","moc_pryd03","moc_pryd04","moc_pryd05","moc_pryd06");
 D30: if ( $RA_SAN_UNLOCK < 300 ) {
 		mes "[ ^2e9c99Warper^000000 ]";
-		mes "Rachel Sanctuary está actualmente ^ff0000bloqueado^000000.";
+		mes "Rachel Sanctuary estÃ¡ actualmente ^ff0000bloqueado^000000.";
 		mes "Para ^009900desbloquearlo^000000, la comunidad debe donar "+F_InsertComma(300000000)+"z en total.";
 		mes " ";
 		mes "Estado actual: "+ $RA_SAN_UNLOCK +" / 300 ^FF6133Millones^000000.";
@@ -320,14 +320,14 @@ D30: if ( $RA_SAN_UNLOCK < 300 ) {
 		.@amt = 1000000;
 		if ( Zeny < .@amt ) {
 			mes "[ ^2e9c99Warper^000000 ]";
-			mes "~ ^FF0000No tienes zeny suficiente para realizar la donación^000000.";
+			mes "~ ^FF0000No tienes zeny suficiente para realizar la donaciÃ³n^000000.";
 			close;
 		}
 		Zeny -= .@amt;
 		$RA_SAN_UNLOCK++;
 		mes "[ ^2e9c99Warper^000000 ]";
-		mes "^009900¡Listo!^000000";
-		mes "Donación actual: "+ $RA_SAN_UNLOCK +" / 300 ^FF6133Millones^000000.";
+		mes "^009900Â¡Listo!^000000";
+		mes "DonaciÃ³n actual: "+ $RA_SAN_UNLOCK +" / 300 ^FF6133Millones^000000.";
 		close;
 	 }
 	 setarray @c[2],140,11,32,21,8,149,204,218,150,9;
