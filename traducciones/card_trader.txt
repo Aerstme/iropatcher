@@ -42,14 +42,14 @@ prtbar,44,24,3	script	Card Recycler	402,{
 		end;
 	case 3:
 		mes "[ ^2e9c99Card Recycler^000000 ]";
-		mes "¡Seguro que nos volvemos a ver!";
+		mes "See you later!";
 		emotion ET_SLEEPY;
 		close;		
 	}
  
 OnSellItem:
 	mes "[ ^2e9c99Card Recycler^000000 ]";
-	mes "Cartas a vender:";
+	mes "Cards to sell:";
 	mes "-----------------------------------";
 	for(set .@i,0; .@i < getarraysize(@sold_nameid); set .@i,.@i+1)
 		if (@sold_nameid[.@i] > 4000 && @sold_nameid[.@i] < 4700) {
@@ -62,7 +62,7 @@ OnSellItem:
 			}
 			set .@mvp, compare(.MVP$,""+@sold_nameid[.@i]);
 			if ( .@mvp ) {
-				mes "~ ^777777Esta es una carta MVP o Miniboss^000000.";
+				mes "~ ^777777This is an MVP or Mini Boss card^000000.";
 				close;
 			}
 			set .@card_id[getarraysize(.@card_id)], @sold_nameid[.@i];
@@ -73,16 +73,16 @@ OnSellItem:
 	deletearray @sold_nameid[0], getarraysize(@sold_nameid);
 	deletearray @sold_quantity[0], getarraysize(@sold_quantity);
 	if (!.@card_id) {
-		mes "~ ^777777(Ninguna)^000000.";
+		mes "~ ^777777(Nothing)^000000.";
 		emotion ET_SWT;
 		close;
 	}
 	mes " ";
 	mes "----- Total: ^0055FF"+.@card_total+" punto(s)^000000. ------";
 	next;
-	if(select("~ ^009900Vender^000000.:~ ^FF0000Cancelar^000000.") == 2) {
+	if(select("~ ^009900Vender^000000.:~ ^FF0000Cancel^000000.") == 2) {
 		mes "[ ^2e9c99Card Recycler^000000 ]";
-		mes "Bueno, vuelve cuando quieras...";
+		mes "Well, come back anytime...";
 		emotion ET_SCRATCH;
 		close;
 	}
@@ -90,7 +90,7 @@ OnSellItem:
 		delitem .@card_id[.@i],.@card_amt[.@i];
 	setd .Points$, getd(.Points$)+.@card_total;
 	mes "[ ^2e9c99Card Recycler^000000 ]";
-	mes "^009900¡Listo!^000000";
+	mes "^009900Done!^000000";
 	emotion ET_DELIGHT;
 	close;
  
@@ -103,19 +103,19 @@ OnBuyItem:
 			}
 	if (.@cost > getd(.Points$)) {
 		mes "[ ^2e9c99Card Recycler^000000 ]";
-		mes "~ ^FF0000No tienes suficientes puntos^000000.";
+		mes "~ ^FF0000You don't have enough points^000000.";
 		emotion ET_HUK;
 	}
 	else {
 		mes "[ ^2e9c99Card Recycler^000000 ]";
-		mes "Item comprado:";
+		mes "Purchased item:";
 		mes "-----------------------------------";
 		for(set .@i,0; .@i < getarraysize(@bought_nameid); set .@i,.@i+1) {
 			getitem @bought_nameid[.@i], @bought_quantity[.@i];
 			mes "~ ^777777"+@bought_quantity[.@i]+"x "+getitemname(@bought_nameid[.@i])+"^000000.";
 		}
 		mes " ";
-		mes "----- Total: ^0055FF"+.@cost+" punto(s)^000000. ------";
+		mes "----- Total: ^0055FF"+.@cost+" point(s)^000000. ------";
 		setd .Points$, getd(.Points$)-.@cost;
 		emotion ET_MONEY;
 	}
