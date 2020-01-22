@@ -3,41 +3,41 @@ prtbar,44,16,2	script	Skill Points	897,{
 	.@skpoint = 21;
 	if ( BaseLevel < 255 || JobLevel < 99 ) {
 		mes "[ ^2e9c99Skill Points^000000 ]";
-		mes "~ ^FF0000Mi servicio solo está disponible para personajes de nivel 255/99^000000.";
+		mes "~ ^FF0000My service is only available for level character 255/99^000000.";
 		close;
 	}
 	if ( SKPointService ) {
 		mes "[ ^2e9c99Skill Points^000000 ]";
-		mes "~ ^FF0000Solo puedes usar mi servicio una vez por personaje^000000.";
+		mes "~ ^FF0000You only can use my service once for character^000000.";
 		close;
 	}
 	setarray .@item,
 		512,2, // Apple x 2
 		513,3; // Banana x 2
 	mes "[ ^2e9c99Skill Points^000000 ]";
-	mes "¡Hola!";
-	mes "Conmigo podrás conseguir "+.@skpoint+" ^800080Skill Points^000000 para poder desempeñar mejor tu labor en el entorno PvE y PvP.";
+	mes "Â¡Hello!";
+	mes "With me you can get "+.@skpoint+" ^800080Skill Points^000000 to be able to perform your work better in PvE y PvP.";
 	next;
 	mes "[ ^2e9c99Skill Points^000000 ]";
-	mes "Para eso, necesitaré que me traigas los siguientes ^1E90FFitems^000000:";
+	mes "For that, i will need you to bring me the next ^1E90FFitems^000000:";
 	for (.@i=0;.@i<getarraysize(.@item);.@i+=2)
 		mes "- " + .@item[.@i+1] + "x " + "^FF6133" + getitemname(.@item[.@i]) + "^000000.";
 	mes "-----------------------------------";
-	mes "¿Tienes todo preparado?";
+	mes "Do you have everything ready?";
 	next;
-	if(select("~ ^009900Entregar items^000000.:~ ^FF0000No, aún no^000000.")==2)close;
+	if(select("~ ^009900Give items^000000.:~ ^FF0000No, not yet^000000.")==2)close;
 	for (.@i=0;.@i<getarraysize(.@item);.@i+=2)
 		if ( countitem(.@item[.@i]) < .@item[.@i+1]) .@error = true;
 	if ( .@error ) {
 		mes "[ ^2e9c99Skill Points^000000 ]";		
-		mes "~ ^FF0000No tienes lo que necesito para poder disfrutar de mi servicio^000000.";
+		mes "~ ^FF0000You dont have what i need to enjoy my services^000000.";
 		close;
 	}
 	for (.@i=0;.@i<getarraysize(.@item);.@i+=2)
 		delitem .@item[.@i], .@item[.@i+1];
 	mes "[ ^2e9c99Skill Points^000000 ]";
-	mes "^009900¡Listo!^000000";
-	mes "Reparte tus puntos saviamente.";
+	mes "^009900Â¡Ready!^000000";
+	mes "Distribute your points wisely";
 	close2;
 	SkillPoint += .@skpoint;
 	SKPointService = true;
@@ -51,50 +51,50 @@ end;
 }
 
 
-prontera,147,155,6	script	Monturas	727,{
-	mes "[ ^2e9c99Monturas^000000 ]";
-	mes "¡Hola!";
-	mes "Conmigo podrás conseguir tus ^800080monturas^000000 desbloqueando el comando ^1E90FF@ride^000000 en toda tu cuenta.";
+prontera,147,155,6	script	Mounts	727,{
+	mes "[ ^2e9c99Mounts^000000 ]";
+	mes "Â¡Hello!";
+	mes "With you can get your ^800080mounts^000000 unlocking the command ^1E90FF@ride^000000 in your account.";
 	next;
-	mes "[ ^2e9c99Monturas^000000 ]";
-	mes "Las ^800080monturas^000000 sirven solamente para caminar un poco más rápido, consigues la misma velocidad cómo si usaras una Box of Thunder, por lo que no otorga ventaja alguna.";
+	mes "[ ^2e9c99Mounts^000000 ]";
+	mes "The ^800080mounts^000000 Only serve to walk a little faster, you get the same speed as if you were using a Box of Thunder, so it does give any advantage.";
 	next;
-	mes "[ ^2e9c99Monturas^000000 ]";
-	mes "Cada clase tiene su ^800080montura^000000 correspondiente, con las que consigues un toque muy bonito y especial, además de ahorrar bastante tiempo y zeny, farmeando o comprando Box of Thunder's.";
+	mes "[ ^2e9c99Mounts^000000 ]";
+	mes "Each job have his own ^800080mount^000000, in which you get a very nice and special touch, in addition to saving a lot of time and zeny, farming or buying Box of Thunder's.";
 	next;
-	mes "[ ^2e9c99Monturas^000000 ]";
-	mes "~ ^FF0000Las monturas no se podrán usar en Eventos, WoE o BG^000000.";
-	mes "El costo para desbloquear en tu cuenta el uso libre de las ^800080monturas^000000 es de 20,000 ^FF6133Cash points^000000.";
+	mes "[ ^2e9c99Mounts^000000 ]";
+	mes "~ ^FF0000You cant use the mounts in Events, WoE or BattleGround^000000.";
+	mes "The cost to unlock ^800080mounts^000000 in your account is 20,000 ^FF6133Cash points^000000.";
 	next;
-	menu "~ ^777777Ver monturas^000000.", ViewMount, "~ ^009900Desbloquear monturas.", UnlockMount;
+	menu "~ ^777777View Mounts^000000.", ViewMount, "~ ^009900Unlock Mount.", UnlockMount;
 	
 ViewMount:
-	mes "[ ^2e9c99Monturas^000000 ]";
-	mes "Haz clic en el link que te aparecerá en la siguiente ventana para ver las ^800080monturas^000000 y sus ^FF8C00animaciones^000000.";
+	mes "[ ^2e9c99Mounts^000000 ]";
+	mes "Click on the link that will appear in the next window to see the ^800080mounts^000000 and their ^FF8C00animations^000000.";
 	next;
-	mes "[ ^2e9c99Monturas^000000 ]";
-	mes "~ ^777777Link^000000: <URL>Ver Monturas<INFO>http://thor.iridium-ro.com/monturas/,800,800</INFO></URL>";
+	mes "[ ^2e9c99Mounts^000000 ]";
+	mes "~ ^777777Link^000000: <URL>View mounts<INFO>http://thor.iridium-ro.com/monturas/,800,800</INFO></URL>";
 	close;
 
 UnlockMount:
 	if ( !#MountPaid ) {
 	mes "[ ^2e9c99Monturas^000000 ]";
-	mes "Necesitaré que me entregues 20,000 ^FF6133Cash points^000000 para desbloquear el uso libre de las ^800080monturas^000000 en tu cuenta.";
-	mes "Estado actual: "+ #CASHPOINTS + " ^FF6133Cash points^000000.";
-	mes "¿Los tienes preparados?";
+	mes "I will need you give me 20,000 ^FF6133Cash points^000000 To unlock the free use of ^800080mounts^000000 in your account.";
+	mes "Actual state: "+ #CASHPOINTS + " ^FF6133Cash points^000000.";
+	mes "Do you have them ready?";
 	next;
-	if (select("~ ^009900Entregar Cash points^000000.:~ ^FF0000No, aún no^000000.")==2)close;
+	if (select("~ ^009900Give Cash points^000000.:~ ^FF0000No, not yet^000000.")==2)close;
 	if ( #CASHPOINTS < 20000 ) {
-		mes "[ ^00BFFFMonturas^000000^000000 ]";
-		mes "~ ^FF0000No tienes lo que necesito para poder disfrutar de mi servicio^000000.";
+		mes "[ ^00BFFFMounts^000000^000000 ]";
+		mes "~ ^FF0000You dont have what i need to enjoy my services^000000.";
 		close;
 	}
 	#CASHPOINTS -= 20000;
 	#MountPaid = true;
 	}
-	mes "[ ^2e9c99Monturas^000000 ]";
-	mes "^009900¡Listo!^000000";
-	mes "Ya puedes usar el comando ^1E90FF@ride^000000 con todos los personajes de tu cuenta.";
+	mes "[ ^2e9c99Mounts^000000 ]";
+	mes "^009900Â¡Ready!^000000";
+	mes "Now you can use the command ^1E90FF@ride^000000 with all the characters in your account.";
 	close;
 	
 OnPCStatCalcEvent: // Should be removed on WoE and Battleground
@@ -108,7 +108,7 @@ OnMount:
 		end;
 	}
 	if ( getmapflag(strcharinfo(3),mf_gvg) || getcharid(4) ) {
-		dispbottom "#IRO: Las monturas no se pueden usar en Eventos, WoE o BG.", 0xffff00;
+		dispbottom "#IRO: You cant use the mounts in Events, WoE or BG.", 0xffff00;
 		end;
 	}
 	if ( ismounting() ) setmounting();
@@ -117,7 +117,7 @@ OnMount:
 	
 OnInit:
 	bindatcmd "ride", strnpcinfo(0)+"::OnMount";
-	waitingroom "[ Monturas ]",0;
+	waitingroom "[ Mounts ]",0;
 end;
 
 }
