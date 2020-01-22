@@ -2,20 +2,20 @@ prontera,163,191,4	script	Build Manager	862,{
 function ManageBuild;
 
 mes "[ ^2e9c99Build Manager^000000 ]";
-mes "¡Hola!";
-mes "Por favor, selecciona un ^FF6133servicio^000000:";
+mes "Â¡Hello!";
+mes "Please, select a ^FF6133service^000000:";
 
-switch( select( ( .BMMode & 1 )?"~ ^FF0000Guardar & cambiar builds^000000.":"",
+switch( select( ( .BMMode & 1 )?"~ ^FF0000Save & change builds^000000.":"",
 				( .BMMode & 2 )?"~ ^0000FFReset status^000000 (250,000z).":"",	
 				( .BMMode & 4 )?"~ ^0000FFReset skills^000000 (250,000z).":"")){
 	Case 1:
 		if(JobLevel < 99 || BaseLevel < 255){
-			mes "~ ^FF0000Mi servicio solo está disponible para personajes de nivel 255/99^000000.";
+			mes "~ ^FF0000My services is only available for level character 255/99^000000.";
 			close;
 		}	
 		
 		for( set .@i,1; .@i <= .MaxSlots; set .@i,.@i + 1 )
-			set .@Menu$,.@Menu$ + (( getd( "Slot_"+.@i+"$" ) == "" )?"^FF0000Slot vacío^000000.":getd( "Slot_"+.@i+"$" ) )+":";
+			set .@Menu$,.@Menu$ + (( getd( "Slot_"+.@i+"$" ) == "" )?"^FF0000Empty Slot^000000.":getd( "Slot_"+.@i+"$" ) )+":";
 		set .@Slot,select( .@Menu$ );
 		do{
 			next;
@@ -25,24 +25,25 @@ switch( select( ( .BMMode & 1 )?"~ ^FF0000Guardar & cambiar builds^000000.":"",
 			mes "AGI - ^0000FF"+getd( "AGI_"+.@Slot )+"^000000      DEX - ^0000FF"+getd( "DEX_"+.@Slot )+"^000000";
 			mes "VIT - ^0000FF"+getd( "VIT_"+.@Slot )+"^000000      LUK - ^0000FF"+getd( "LUK_"+.@Slot )+"^000000";
 			mes " ";
-			mes "Puntos restantes: ^0000FF"+getd( "STATS_"+.@Slot )+"^000000";
-			set .@Option,select(( getd( "Slot_"+.@Slot+"$" ) == "" )?"":"~ ^0000FFCambiar build.",
-								( getd( "Slot_"+.@Slot+"$" ) == "" )?"~ ^009900Guardar build^000000.":"",
-								( getd( "Slot_"+.@Slot+"$" ) == "" )?"":"~ ^FF0000Limpiar build^000000." );
+			mes "Remaining : ^0000FF"+getd( "STATS_"+.@Slot )+"^000000";
+			set .@Option,select(( getd( "Slot_"+.@Slot+"$" ) == "" )?"":"~ ^0000FFChange build.",
+								( getd( "Slot_"+.@Slot+"$" ) == "" )?"~ ^009900Save 
+build^000000.":"",
+								( getd( "Slot_"+.@Slot+"$" ) == "" )?"":"~ ^FF0000Wipe build^000000." );
 			ManageBuild( .@Slot,.@Option);
 		}while( .@Option != 1 );
 		break;
 	Case 2:
-		if(Zeny < 250000 ){ mes "~ ^FF0000No tienes zeny suficiente para resetear tus status^000000."; close;}
+		if(Zeny < 250000 ){ mes "~ ^FF0000You do not have enough zeny to reset your stats^000000."; close;}
 		ResetStatus;
 		set Zeny, Zeny - 250000;
-		mes "^009900Tus status han sido reseteados.^000000";
+		mes "^009900Your stats has been reset.^000000";
 		break;
 	Case 3:
-		if(Zeny < 250000 ){ mes "~ ^FF0000No tienes zeny suficiente para resetear tus skills^000000."; close;}
+		if(Zeny < 250000 ){ mes "~ ^FF0000You do not have enough zeny to reset your skills^000000."; close;}
 		ResetSkill;
 		set Zeny, Zeny - 250000;
-		mes "^009900Tus skills han sido reseteadas.^000000";
+		mes "^009900Your skills has been reset.^000000";
 		break;
 }
 close;
@@ -50,7 +51,7 @@ close;
 function	ManageBuild	{
 switch( getarg(1) ){
 	Case 1:	//	Switch Build
-		message strcharinfo(0),"Has cambiado tu build.";
+		message strcharinfo(0),"You have changed your build.";
 			ResetStatus;
 			set StatusPoint,getd( "STATS_"+getarg(0) );
 			statusup2 bStr,getd( "STR_"+getarg(0) ) - 1;
@@ -70,8 +71,8 @@ switch( getarg(1) ){
 			setd( "STATS_"+getarg(0) ),StatusPoint;
 		if( .Length[0] < .Length[1] && .Length[0] ){
 			mes " ";
-			mes "Colócale un ^FF0000nombre^000000 a la build.";
-			mes "^FF0000Nombre^000000 : "+.Length[0]+" ~ "+.Length[1]+" Carácteres.";
+			mes "Put a ^FF0000name^000000 for your build.";
+			mes "^FF0000Name^000000 : "+.Length[0]+" ~ "+.Length[1]+" CarÃ¡cteres.";
 			do{
 				input getd( "Slot_"+getarg(0)+"$" );
 			}while( getstrlen( getd( "Slot_"+getarg(0)+"$" ) ) < .Length[0] || getstrlen( getd( "Slot_"+getarg(0)+"$" ) ) > .Length[1] );
