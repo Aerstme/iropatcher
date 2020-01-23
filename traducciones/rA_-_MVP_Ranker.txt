@@ -12,29 +12,29 @@ prontera,139,183,7	script	MvP Rank	863,{
 	query_sql("SELECT COUNT(`kill_char_id`) FROM `"+.database_schema$[0]+"`.`mvplog`",.@t1);
 	while (1) {
 		switch(select(
-			"~ ^009900Mis estadisticas^000000.",
-			"~ Ranking global (Top "+.top_rank_global+").",
-			"~ Ranking mensual (Top "+.top_rank_monthly+").",
-			"~ Ranking semanal (Top "+.top_rank_weekly+").",
-			"~ Filtrar por MvP ^ff0000["+.@t1+"]^000000.",
-			"~ ^1E90FFInformación y premios^000000.",
+			"~ ^009900My Stats^000000.",
+			"~ Global Ranking (Top "+.top_rank_global+").",
+			"~ Monthly Ranking (Top "+.top_rank_monthly+").",
+			"~ Weekly Rangking (Top "+.top_rank_weekly+").",
+			"~ Filter by MvP ^ff0000["+.@t1+"]^000000.",
+			"~ ^1E90FFInformation and prizes^000000.",
 			"Salir."
 		)) {
 			case 1:
-				mes "[ ^2e9c99Mis estadisticas^000000 ]";
+				mes "[ ^2e9c99My Stats^000000 ]";
 				query_sql("SELECT COUNT(`mvp_id`) FROM `"+.database_schema$[0]+"`.`mvplog` WHERE `kill_char_id` = "+.@cid+" "+.disabled_map_query$+" GROUP BY `kill_char_id`", .@total_kill);
-				mes "MvPs Totales: "+"^ff0000["+F_InsertComma(.@total_kill)+"]^000000";
+				mes "Total MvP: "+"^ff0000["+F_InsertComma(.@total_kill)+"]^000000";
 				query_sql("SELECT `monster_id` FROM `"+.database_schema$[0]+"`.`mvplog` WHERE `kill_char_id` = "+.@cid+" "+.disabled_map_query$+" ORDER BY `mvp_id` DESC LIMIT 1", .@last_mob_id);
-				mes "Último MvP: "+getmonsterinfo(.@last_mob_id, MOB_NAME);
+				mes "Last MvP: "+getmonsterinfo(.@last_mob_id, MOB_NAME);
 				mes " ";
-				mes "Historial MvPs:";
+				mes "MvPs Record:";
 				.@size = query_sql("SELECT `monster_id`, COUNT(`mvp_id`) AS `total` FROM `"+.database_schema$[0]+"`.`mvplog` WHERE YEAR(`mvp_date`) = "+.year+" AND `kill_char_id` = "+.@cid+" "+.disabled_map_query$+" GROUP BY `kill_char_id`,`monster_id` ORDER BY `total` DESC", .@mob_id, .@mob_kill);
 				if (.@size) {
 					for (.@i = 0; .@i < .@size; .@i++)
 						mes getmonsterinfo(.@mob_id[.@i], MOB_NAME)+" - " + "^ff0000["+.@mob_kill[.@i]+"]^000000";
 				}
 				else {
-					mes "~ ^FF0000No hay registros^000000.";
+					mes "~ ^FF0000No Records^000000.";
 				}
 				break;
 			case 2:
@@ -46,24 +46,24 @@ prontera,139,183,7	script	MvP Rank	863,{
 						mes "Top "+(.@i+1)+": ^0055FF"+.@name$[.@i]+"^000000 - ^FF0000"+.@total[.@i]+"^000000 MvP(s).";
 				}
 				else {
-					mes "~ ^FF0000No hay registros^000000.";
+					mes "~ ^FF0000No records^000000.";
 				}
 				break;
 			case 3:
 				.@month = select(
-					"~ Mes actual.",
-					"Enero.",
-					"Febrero.",
-					"Marzo.",
-					"Abril.",
-					"Mayo.",
-					"Junio.",
-					"Julio.",
-					"Agosto.",
-					"Septiembre.",
-					"Octubre.",
-					"Noviembre.",
-					"Diciembre."
+					"~ Current Month.",
+					"January.",
+					"February.",
+					"March.",
+					"April.",
+					"May.",
+					"June.",
+					"July.",
+					"August.",
+					"September.",
+					"October.",
+					"November.",
+					"Dicember."
 				) - 1;
 				if (.@month <= 0)
 					.@month = .month;
@@ -75,7 +75,7 @@ prontera,139,183,7	script	MvP Rank	863,{
 						mes "Top "+(.@i+1)+": ^0055FF"+.@name$[.@i]+"^000000 - ^FF0000"+.@total[.@i]+"^000000 MvP(s).";
 				}
 				else {
-					mes "~ ^FF0000No hay registros^000000.";
+					mes "~ ^FF0000No records^000000.";
 				}
 				break;
 			case 4:
@@ -88,7 +88,7 @@ prontera,139,183,7	script	MvP Rank	863,{
 						mes "Top "+(.@i+1)+": ^0055FF"+.@name$[.@i]+"^000000 - ^FF0000"+.@total[.@i]+"^000000 MvP(s).";
 				}
 				else {
-					mes "~ ^FF0000No hay registros^000000.";
+					mes "~ ^FF0000No records^000000.";
 				}
 				break;
 			case 5:
@@ -109,33 +109,33 @@ prontera,139,183,7	script	MvP Rank	863,{
 						mes "Top "+(.@i+1)+": ^0055FF"+.@name$[.@i]+"^000000 - ^FF0000["+.@total[.@i]+"]^000000.";
 				}
 				else {
-					mes "~ ^FF0000No hay registros^000000.";
+					mes "~ ^FF0000No records^000000.";
 				}
 				break;
 			case 6:
-				mes "[ ^2e9c99Información^000000 ]";
-				mes "¡Hola!";
-				mes "Conmigo podrás ver el registro de todos los players que matan ^FF6133MVP(s)^000000 en ^2e9c99Iridium RO^000000.";
+				mes "[ ^2e9c99Information^000000 ]";
+				mes "Hello!";
+				mes "With me you can see the records of all players that kill ^FF6133MVP(s)^000000 in ^2e9c99Iridium RO^000000.";
 				next;
-				mes "[ ^2e9c99Información^000000 ]"; 
-				mes "Es mi deber mostrar a los jugadores las estadisticas globables, mensuales y semanales.";
+				mes "[ ^2e9c99Information^000000 ]"; 
+				mes "Its my duty show to the players the global, monthly and weekly statistics.";
 				next;	
-				mes "[ ^2e9c99Premios^000000 ]";
-				mes "Los premios se darán ^800080mensualmente^000000 a los jugadores TOP 3 del Ranking.";
-				mes "~ ^FF0000Nota: El Ranking no aplica restricción en ningún mapa^000000.";
+				mes "[ ^2e9c99Prizes^000000 ]";
+				mes "The prizes will be given ^800080monthly^000000 to the TOP 3 players ranking.";
+				mes "~ ^FF0000Note: The Ranking does not apply restriction on any map^000000.";
 				next;
-				mes "[ ^2e9c99Premios^000000 ]";
-				mes "======== Premios ========";
-				mes "^009900Primer lugar^000000: 45,000,000 Zeny + Aun no lo se";
+				mes "[ ^2e9c99Prizes^000000 ]";
+				mes "======== Prizes ========";
+				mes "^009900First place^000000: 45,000,000 Zeny + i dont know";
 				mes " ";
-				mes "^00BFFFSegundo lugar^000000: 30,000,000 Zeny + Aun no lo se";
+				mes "^00BFFFSecond place^000000: 30,000,000 Zeny + i dont know";
 				mes " ";
-				mes "^FF33E6Tercer lugar^000000: 15,000,000 Zeny + Aun no lo se";
+				mes "^FF33E6Third Place^000000: 15,000,000 Zeny + i dont know";
 				next;
-				mes "[ ^2e9c99Premios^000000 ]";
-				mes "Cada fin de ^800080mes^000000, los ganadores recibirán sus premios vía RoDEX (Mail).";
+				mes "[ ^2e9c99Prizes^000000 ]";
+				mes "End of the ^800080month^000000, The winners will receive their prizes via RoDEX (Mail).";
 				mes "-----------------------------------";
-				mes "~ ^777777¡Ánimo y a matar muchos MVP(s)!";
+				mes "~ ^777777Cheer up! and go kill MvP(s)!";
 				break;
 			default:
 				close;
