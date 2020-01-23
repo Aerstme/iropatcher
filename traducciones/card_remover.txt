@@ -22,15 +22,15 @@ prontera,164,151,3	script	Card Remover	91,{
 
 	disable_items;
 	mes "[ ^00BFFF^00BFFFCard Remover^000000^000000 ]";
-	mes "Hola!";
-	mes "Conmigo podrás ^800080remover^000000 todas las ^1E90FFcartas^000000 de tus ^FF8C00items^000000";
-	mes "Te agrada esta idea?";
+	mes "Â¡Hello!";
+	mes "With me you can ^800080remove^000000 all the  ^1E90FFcards^000000 in your ^FF8C00items^000000";
+	mes "Do you like this idea?";
 	next;
-	switch(select("~ ^009900Si, por favor!^000000:~ Información:~ ^FF0000No, gracias!^000000")) {
+	switch(select("~ ^009900Yes, please!^000000:~ Information:~ ^FF0000No, Thanks!^000000")) {
 	case 1:
 		mes "[ ^00BFFF^00BFFFCard Remover^000000^000000 ]";
-		mes "Muy bien.";
-		mes "Qué ^FF8C00item^000000 quieres que ^800080examine^000000?";
+		mes "Alright!.";
+		mes "What ^FF8C00item^000000 do you want me to ^800080examine^000000?";
 		next;
 
 		setarray .@indices[1], EQI_HEAD_TOP, EQI_ARMOR, EQI_HAND_L, EQI_HAND_R, EQI_GARMENT, EQI_SHOES, EQI_ACC_L, EQI_ACC_R, EQI_HEAD_MID, EQI_HEAD_LOW;
@@ -42,34 +42,34 @@ prontera,164,151,3	script	Card Remover	91,{
 		set .@part, .@indices[ select(.@menu$) ];
 		if(!getequipisequiped(.@part)) {
 			mes "[ ^00BFFF^00BFFFCard Remover^000000^000000 ]";
-			mes "~ ^FF0000No llevas nada equipado a lo que le pueda remover la carta.^000000";
+			mes "~ ^FF0000Oh! you dont have anything equipped to which the card can be removed.^000000";
 			close;
 		}
 		if(getequipcardcnt(.@part) == 0) {
 			mes "[ ^00BFFF^00BFFFCard Remover^000000^000000 ]";
-			mes "~ ^FF0000Este item no tiene ninguna carta.^000000";
+			mes "~ ^FF0000This item does not have any card.^000000";
 			close;
 		}
 		set .@cardcount,getequipcardcnt(.@part);
 		
 		if (!checkweight(1202,(.@cardcount+1))) { 
 			mes "[ ^00BFFF^00BFFFCard Remover^000000^000000 ]";
-			mes "~ ^FF0000Estás con sobrepeso, ve a vaciar tu inventario y vuelve.^000000";
+			mes "~ ^FF0000You have overweight, go empty your inventory and come back.^000000";
 			close;
 		}
 		mes "[ ^00BFFF^00BFFFCard Remover^000000^000000 ]";
-		mes "Este ^800080item^000000 tiene " + .@cardcount + " ^1E90FFcarta^000000.";
-		mes "^009900Necesitaré^000000 " + (.zenycost+(.@cardcount * .percardcost)) + "z, un ^FF8C00Star Crumb^000000 y una ^FF8C00Yellow Gemstone^000000.";
-		mes "Tienes lo que necesito?";
+		mes "This ^800080item^000000 have " + .@cardcount + " ^1E90FFcards^000000.";
+		mes "^009900I will need^000000 " + (.zenycost+(.@cardcount * .percardcost)) + "z, a ^FF8C00Star Crumb^000000 and one ^FF8C00Yellow Gemstone^000000.";
+		mes "Do you have the items?";
 		next;
-		if(select("~ ^009900Entregar todo^000000:~ ^FF0000No^000000, aún no") == 2) {
+		if(select("~ ^009900Give everything^000000:~ ^FF0000No^000000, not yet") == 2) {
 			mes "[ ^00BFFF^00BFFFCard Remover^000000^000000 ]";
-			mes "Bueno... ^FF6133vuelve^000000 cuando quieras ^^";
+			mes "Good... ^FF6133Come back^000000 anytime ^^";
 			close;
 		}
 		if((zeny < (.zenycost+(.@cardcount * .percardcost))) || (countitem(1000) < 1) || (countitem(715) < 1)) {
 			mes "[ ^00BFFF^00BFFFCard Remover^000000^000000 ]";
-			mes "~ ^FF0000Lo siento, no tienes todo lo que necesito para poder remover tu carta.^000000";
+			mes "~ ^FF0000im Sorry, You dont have what i need to remove your card.^000000";
 			close;
 		}
 		set Zeny, Zeny - (.zenycost+(.@cardcount * .percardcost));
@@ -78,16 +78,16 @@ prontera,164,151,3	script	Card Remover	91,{
 		
 		successremovecards .@part;
 		mes "[ ^00BFFF^00BFFFCard Remover^000000^000000 ]";
-		mes "^009900¡Listo!^000000";
-		mes "^FF6133Vuelve^000000 cuando quieras ^^";
+		mes "^009900Its ready!^000000";
+		mes "^FF6133Come back^000000 anytime ^^";
 		close;
 	case 2:
 		mes "[ ^00BFFF^00BFFFCard Remover^000000^000000 ]";
-		mes "Cobro una ^1E90FFtarifa plana^000000 de "+callfunc("F_InsertComma",.zenycost)+"z. ^FF6133Adicionalmente^000000, por cada carta que remueva, te cobraré "+callfunc("F_InsertComma",.percardcost)+"z. Y ^009900necesito^000000 que me traigas un ^FF8C00Star Crumb^000000 y una ^FF8C00Yellow Gemstone^000000.";
+		mes "I charge a ^1E90FFflat rate^000000 of "+callfunc("F_InsertComma",.zenycost)+"z. ^FF6133Additionally^000000, For every card removed, i will charge "+callfunc("F_InsertComma",.percardcost)+"z. And ^009900i need^000000 you bring me a ^FF8C00Star Crumb^000000 and one ^FF8C00Yellow Gemstone^000000.";
 		close;
 	case 3:
 		mes "[ ^00BFFF^00BFFFCard Remover^000000^000000 ]";
-		mes "Bueno... ^FF6133vuelve^000000 cuando quieras ^^";
+		mes "Good... ^FF6133Come back^000000 anytime ^^";
 		close;
 	}
 OnInit:
