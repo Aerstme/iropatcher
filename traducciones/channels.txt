@@ -7,9 +7,9 @@
 		end;
 		
 	OnChannel:
-		    mes "[ ^FF1493Canales de Texto^000000 ]";
-			mes "Maneja diferentes canales dependiendo de las necesidades que tengas.";
-			mes "Puedes cambiar esta configuracion cuando quieras utilizando el comando: ^FF1493@channels^000000";
+		    mes "[ ^FF1493Channel Text^000000 ]";
+			mes "Manage different channels depending on the needs you have.";
+			mes "You can change this settings using the command: ^FF1493@channels^000000";
 						//mes "LIKE -> <URL>Facebook page<INFO>http://www.facebook.com/TirionRO/,300,300</INFO></URL> ";
 
 		do{
