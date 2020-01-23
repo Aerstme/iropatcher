@@ -1,15 +1,15 @@
 prontera,148,191,5	script	Kafra	112,{
 	mes "[ ^2e9c99Kafra^000000 ]";
-	mes "¡Hola!";
-	mes "Conmigo puedes guardar tu posición en este mapa.";
-	mes "También podrás abrir tus ^009900stor^000000^1E90FFages^000000 y revisar los ^FF6133logs^000000 de tu ^FF6133guild storage^000000.";
+	mes "Hello!";
+	mes "With me you can save your position on this map.";
+	mes "Also you can open your ^009900stor^000000^1E90FFages^000000 and check the ^FF6133logs^000000 of you ^FF6133guild storage^000000.";
 	next;
-	menu "~ Guardar punto.", M1, "~ ^009900Abrir storage^000000.", M2, "~ ^1E90FFAbrir guild storage^000000.", M3, "~ ^FF6133Logs guild storage^000000.", M4;
+	menu "~ Save Point.", M1, "~ ^009900Open storage^000000.", M2, "~ ^1E90FFOpen guild storage^000000.", M3, "~ ^FF6133Logs guild storage^000000.", M4;
 	
 M1: mes "[ ^2e9c99Kafra^000000 ]";
-	mes "¿Estás seguro que quieres guardar tu posición en este mapa?";
-	if(select("~ ^009900Si, por favor^000000.:~ ^FF0000No, gracias^000000.")==2)close;
-		mes "^009900¡Listo!^000000";
+	mes "Are you sure you want to save your position on this map?";
+	if(select("~ ^009900Yes, Please^000000.:~ ^FF0000No, Thanks^000000.")==2)close;
+		mes "^009900Ready!^000000";
 	getmapxy(@map$, @x, @y, BL_PC);
 	if(@map$ == "prontera"){
 		save @map$,155,189;
@@ -26,44 +26,44 @@ M1: mes "[ ^2e9c99Kafra^000000 ]";
 	close;
 
 M2: mes "[ ^2e9c99Kafra^000000 ]";
-	mes "Abriendo ^009900storage^000000...";
+	mes "Opening ^009900storage^000000...";
 	close2;
 	openstorage;
 	end;
 
 M3: mes "[ ^2e9c99Kafra^000000 ]";
-	mes "Abriendo ^1E90FFguild storage^000000...";
+	mes "Opening ^1E90FFguild storage^000000...";
 	close2;
 			switch(guildopenstorage()){
 				case GSTORAGE_OPEN: break;
 				case GSTORAGE_STORAGE_ALREADY_OPEN: mes "[ ^2e9c99Kafra^000000 ]";
-				mes "~ ^FF0000Necesitas cerrar el storage para que el guild storage se abra correctamente^000000."; break;
+				mes "~ ^FF0000You need close your storage so that guild storage opens correctly ^000000."; break;
 				case GSTORAGE_ALREADY_OPEN: mes "[ ^2e9c99Kafra^000000 ]";
-				mes "~ ^FF0000Actualmente tienes el guild storage abierto^000000."; break;
+				mes "~ ^FF0000Actually you have open your guild storage^000000."; break;
 				case GSTORAGE_NO_GUILD: mes "[ ^2e9c99Kafra^000000 ]";
-				mes "~ ^FF0000Para abrir el guild storage debes formar parte de una guild^000000."; break;
+				mes "~ ^FF0000To open a guild storage you must be part of a guild^000000."; break;
 				case GSTORAGE_NO_STORAGE: mes "[ ^2e9c99Kafra^000000 ]"; 
-				mes "~ ^FF0000A la guild se le está imposibilitando abrir el guild storage^000000."; break;
+				mes "~ ^FF0000The guild is being unable to open the guild storage^000000."; break;
 				case GSTORAGE_NO_PERMISSION: mes "[ ^2e9c99Kafra^000000 ]";
-				mes "~ ^FF0000Tu guild master debe darte el permiso correspondiente para poder abrir el guild storage^000000."; break;
+				mes "~ ^FF0000Your guild master must give you the permission to open the guild storage^000000."; break;
 			}
 	end;
 	
 M4:
 	if(!getcharid(2)){
 				mes "[ ^2e9c99Kafra^000000 ]";
-				mes "~ ^FF0000Para revisar los logs del guild storage debes formar parte de una guild^000000.";
+				mes "~ ^FF0000For check the logs you must be part of a guild^000000.";
 				close;
 			}
 			if(!guild_has_permission(GUILD_PERM_STORAGE)){
 				mes "[ ^2e9c99Kafra^000000 ]";
-				mes "~ ^FF0000Tu guild master debe darte el permiso correspondiente para poder revisar los logs del guild storage^000000.";
+				mes "~ ^FF0000Your guild master must give you the permission to check the logs of the guild storage^000000.";
 				close;
 			}
 			query_sql("SELECT `time`,`name`,`nameid`,`amount` FROM `guild_storage_log` WHERE `guild_id` = '" + getcharid(2) + "' order by `id` DESC", .@time$ ,.@name$,.@item_id,.@amount);
 			if(!.@item_id){
 				mes "[ ^2e9c99Kafra^000000 ]";
-				mes "~ ^FF0000No hay registros^000000.";
+				mes "~ ^FF0000No records^000000.";
 				close;
 			}
 			dispbottom "==========================================================================",0xFFD64F;
