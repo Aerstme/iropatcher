@@ -10,15 +10,15 @@
 -	script	Costume Clown	-1,{
 	disable_items;
 	mes "[ ^2e9c99Costume Clown^000000 ]";
-	mes "¡Hola!";
-	mes "Conmigo puedes ^800080convertir^000000 tus headgears en costume's o ^FF6133restaurarlos^000000 a su forma original.";
-	mes "Debes tener el item equipado.";
+	mes "Hello!";
+	mes "With me you can ^800080turn into^000000costumes your headgears or ^FF6133restore^000000 in its original form.";
+	mes "You must have the item equipped.";
 	next;
-	switch(select("~ ^009900Convertir en costume^000000.:~ ^1E90FFRestaurar costume^000000.:~ ^FF0000No, gracias^000000.")) {
+	switch(select("~ ^009900Turn into Costume^000000.:~ ^1E90FFRestore costume^000000.:~ ^FF0000No, Thanks^000000.")) {
 	case 1:
 			mes "[ ^2e9c99Costume Clown^000000 ]";
 			mes "Por favor, selecciona el item que quieras ^800080convertir^000000.";
-			mes "~ ^FF0000Nota: Perderás el refinamiento y las cartas de los items que quieras convertir en costume, ten mucho cuidado^000000.";
+			mes "~ ^FF0000Nota: You will lost the refinement and the cards equipped in the item what do you want to turn into a costume, be careful^000000.";
 			next;
 				setarray .@Position$[1],"Top","Mid","Low";
 				setarray .@Position[1], EQI_HEAD_TOP, EQI_HEAD_MID, EQI_HEAD_LOW;
@@ -33,28 +33,28 @@
 			if( !getequipisequiped(.@Part) )
 			{
 				mes "[ ^2e9c99Costume Clown^000000 ]";
-				mes "~ ^FF0000No tienes equipado ningún item^000000.";
+				mes "~ ^FF0000You do not have any item equipped^000000.";
 				close;
 			}
 			mes "[ ^2e9c99Costume Clown^000000 ]";
-			mes "¿Quieres ^800080convertir^000000 en costume tu " + getitemname(getequipid(.@Part)) + "?";
+			mes "Do you want to ^800080turn into^000000 costume your " + getitemname(getequipid(.@Part)) + "?";
 			next;
 			if( select("~ ^009900Si, por favor^000000.:~ ^FF0000No, gracias^000000.") == 2 )
 			{
 				mes "[ ^2e9c99Costume Clown^000000 ]";
-				mes "Necesitas algo de tiempo para pensarlo, ¿eh?";
-				mes "Está bien, es entendible.";
+				mes "Oh, you need some time to think about it, eh?";
+				mes "EstÃ¡ bien, es entendible.";
 				close;
 			}
 			costume .@Part; // Convert the Headgear
 			mes "[ ^2e9c99Costume Clown^000000 ]";
-			mes "^009900¡Listo!^000000";
+			mes "^009900Ready!^000000";
 			close;
 	case 2:
 			next;
 			mes "[ ^2e9c99Costume Clown^000000 ]";
-			mes "Por favor, selecciona el item que quieras ^FF6133restaurar^000000.";
-			mes "~ ^FF0000Nota: Restauraré el item sin refinamiento o cartas^000000.";
+			mes "Please, select the item what you want to ^FF6133restore^000000.";
+			mes "~ ^FF0000Note: I will restore the item without refinement or cards^000000.";
 			next;
 				setarray .@Position$[1],"Top","Mid","Low";
 				setarray .@Position[1],     EQI_COSTUME_HEAD_TOP,    EQI_COSTUME_HEAD_MID,   EQI_COSTUME_HEAD_LOW;
@@ -69,22 +69,22 @@
 			if( !getequipisequiped(.@Part) )
 			{
 				mes "[ ^2e9c99Costume Clown^000000 ]";
-				mes "~ ^FF0000No tienes equipado ningún item^000000.";
+				mes "~ ^FF0000You do not have any item equipped^000000.";
 				close;
 			}
 			if ( getequipid(.@Part) >= 19500 && getequipid(.@Part) <= 20499 ) {
 				mes "[ ^2e9c99Costume Clown^000000 ]"; 
-				mes "~ ^FF0000Solo puedes restaurar los items que previamente hayan sido convertidos por mi^000000.";
+				mes "~ ^FF0000You only can restore the items that we have previously been converted by me^000000.";
 				close;
 			}
 			mes "[ ^2e9c99Costume Clown^000000 ]";
-			mes "¿Quieres ^FF6133restaurar^000000 tu Costume's " + getitemname(getequipid(.@Part)) + "?";
+			mes "Do you want to^FF6133restore^000000 your Costumes " + getitemname(getequipid(.@Part)) + "?";
 			next;
 			if( select("~ ^009900Si, por favor^000000.:~ ^FF0000No, gracias^000000.") == 2 )
 			{
 				mes "[ ^2e9c99Costume Clown^000000 ]";
-				mes "Necesitas algo de tiempo para pensarlo, ¿eh?";
-				mes "Está bien, es entendible.";
+				mes "Oh, you need some time to think about it, eh?";
+				mes "Its fine, i understand.";
 				close;
 			}
 			a = getequipid(.@Part);			
@@ -92,11 +92,11 @@
 			getitem a,1;
 			
 			mes "[ ^2e9c99Costume Clown^000000 ]";
-			mes "^009900¡Listo!^000000";
+			mes "^009900Ready!^000000";
 			close;
 	case 3:
 		mes "[ ^2e9c99Costume Clown^000000 ]";
-		mes "Bueno, regresa cuando necesites de mis servicios.";
+		mes "Nice, Come back when you need my services.";
 		close;
 	}
 
