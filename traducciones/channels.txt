@@ -27,14 +27,14 @@
 				next;
 
 				channel_kick("#main",strcharinfo(0));
-				dispbottom ("#TRO: Si quieres volver a leer los mensajes de este canal, activalo por @channels o whispea directamente al canal #main y entraras automaticamente.",0x00FA9A,getcharid(0));
+				dispbottom ("#TRO: If you want to read the messages of this channel again, activate it by @channels or whisper directly to the #main channel and you will automatically enter.",0x00FA9A,getcharid(0));
 
 				}else{
 					#CHANNEL_SETTINGS |= (1 << .@i);
 										next;
 
 					atcommand "@join #main";
-					dispbottom ("#TRO: Whispea a #main y escribe un mensaje para mandarlo al canal, si quieres dejar de leer los mensajes de este canal, desactivalo por @channels.",0xFFFF00,getcharid(0));
+					dispbottom ("#TRO: Whisper to #main and write a message to send to this channel, If you want to stop reading the messages on this channel, disable it by @channels.",0xFFFF00,getcharid(0));
 
 				}
 			
@@ -45,14 +45,14 @@
 									next;
 
 				channel_kick("#trade",strcharinfo(0));
-				dispbottom ("#TRO: Si quieres volver a leer los mensajes de este canal, activalo por @channels o whispea directamente al canal #trade y entraras automaticamente.",0x00FA9A,getcharid(0));
+				dispbottom ("#TRO: If you want to read the messages of this channel again, activate it by @channels or whisper directly to the #trade channel and you will automatically enter.",0x00FA9A,getcharid(0));
 
 				}else{
 					#CHANNEL_SETTINGS |= (1 << .@i);
 										next;
 
 					atcommand "@join #trade";
-					dispbottom ("#TRO: Whispea a #trade y escribe un mensaje para mandarlo al canal, si quieres dejar de leer los mensajes de este canal, desactivalo por @channels.",0xFFFF00,getcharid(0));
+					dispbottom ("#TRO: Whisper to #trade and write a message to send to this channel, If you want to stop reading the messages on this channel, disable it by @channels.",0xFFFF00,getcharid(0));
 
 				}
 			break;
@@ -63,13 +63,13 @@
 									next;
 
 				channel_kick("#support",strcharinfo(0));
-				dispbottom ("#TRO: Si quieres volver a leer los mensajes de este canal, activalo por @channels o whispea directamente al canal #support y entraras automaticamente.",0x00FA9A,getcharid(0));
+				dispbottom ("#TRO: If you want to read the messages of this channel again, activate it by @channels or whisper directly to the #support channel and you will automatically enter.",0x00FA9A,getcharid(0));
 
 				}else{
 					#CHANNEL_SETTINGS |= (1 << .@i);
 					next;
 					atcommand "@join #support";
-					dispbottom ("#TRO: Whispea a #support y escribe un mensaje para mandarlo al canal, si quieres dejar de leer los mensajes de este canal, desactivalo por @channels.",0xFFFF00,getcharid(0));
+					dispbottom ("#TRO: Whisper to #support and write a message to send to this channel, If you want to stop reading the messages on this channel, disable it by @channels.",0xFFFF00,getcharid(0));
 
 				}
 			break;
@@ -80,14 +80,14 @@
 									next;
 
 				channel_kick("#spam",strcharinfo(0));
-				dispbottom ("#TRO: Si quieres volver a leer los mensajes de este canal, activalo por @channels o whispea directamente al canal #spam y entraras automaticamente.",0x00FA9A,getcharid(0));
+				dispbottom ("#TRO: If you want to read the messages of this channel again, activate it by @channels or whisper directly to the #spam channel and you will automatically enter.",0x00FA9A,getcharid(0));
 
 				}else{
 					#CHANNEL_SETTINGS |= (1 << .@i);
 										next;
 
 					atcommand "@join #spam";
-					dispbottom ("#TRO: Whispea a #spam y escribe un mensaje para mandarlo al canal, si quieres dejar de leer los mensajes de este canal, desactivalo por @channels.",0xFFFF00,getcharid(0));
+					dispbottom ("#TRO: Whisper to #spam and write a message to send to this channel, If you want to stop reading the messages on this channel, disable it by @channels.",0xFFFF00,getcharid(0));
 
 				}
 			break;
@@ -98,14 +98,14 @@
 									next;
 
 				channel_kick("#english",strcharinfo(0));
-				dispbottom ("#TRO: Si quieres volver a leer los mensajes de este canal, activalo por @channels o whispea directamente al canal #english y entraras automaticamente.",0x00FA9A,getcharid(0));
+				dispbottom ("#TRO: If you want to read the messages of this channel again, activate it by @channels or whisper directly to the #english channel and you will automatically enter.",0x00FA9A,getcharid(0));
 
 				}else{
 					#CHANNEL_SETTINGS |= (1 << .@i);
 										next;
 
 					atcommand "@join #english";
-					dispbottom ("#TRO: Whispea a #english y escribe un mensaje para mandarlo al canal, si quieres dejar de leer los mensajes de este canal, desactivalo por @channels.",0xFFFF00,getcharid(0));
+					dispbottom ("#TRO:Whisper to #english and write a message to send to this channel, If you want to stop reading the messages on this channel, disable it by @channels.",0xFFFF00,getcharid(0));
 
 				}
 			break;
@@ -116,14 +116,14 @@
 									next;
 
 				channel_kick("#portuguese",strcharinfo(0));
-				dispbottom ("#TRO: Si quieres volver a leer los mensajes de este canal, activalo por @channels o whispea directamente al canal #portuguese y entraras automaticamente.",0x00FA9A,getcharid(0));
+				dispbottom ("#TRO:If you want to read the messages of this channel again, activate it by @channels or whisper directly to the #portuguese channel and you will automatically enter.",0x00FA9A,getcharid(0));
 
 				}else{
 					#CHANNEL_SETTINGS |= (1 << .@i);
 										next;
 
 					atcommand "@join #portuguese";
-					dispbottom ("#TRO: Whispea a #portuguese y escribe un mensaje para mandarlo al canal, si quieres dejar de leer los mensajes de este canal, desactivalo por @channels.",0xFFFF00,getcharid(0));
+					dispbottom ("#TRO: Whisper to #portuguese and write a message to send to this channel, If you want to stop reading the messages on this channel, disable it by @channels.",0xFFFF00,getcharid(0));
 
 				}
 			break;
@@ -134,14 +134,14 @@
 									next;
 
 				channel_kick("#tagalog",strcharinfo(0));
-				dispbottom ("#TRO: Si quieres volver a leer los mensajes de este canal, activalo por @channels o whispea directamente al canal #tagalog y entraras automaticamente.",0x00FA9A,getcharid(0));
+				dispbottom ("#TRO: If you want to read the messages of this channel again, activate it by @channels or whisper directly to the #tagalog channel and you will automatically enter.",0x00FA9A,getcharid(0));
 
 				}else{
 					#CHANNEL_SETTINGS |= (1 << .@i);
 										next;
 
 					atcommand "@join #tagalog";
-					dispbottom ("#TRO: Whispea a #tagalog y escribe un mensaje para mandarlo al canal, si quieres dejar de leer los mensajes de este canal, desactivalo por @channels.",0xFFFF00,getcharid(0));
+					dispbottom ("#TRO:Whisper to #tagalog and write a message to send to this channel, If you want to stop reading the messages on this channel, disable it by @channels.",0xFFFF00,getcharid(0));
 
 				}
 				break;
@@ -152,14 +152,14 @@
 									next;
 
 				channel_kick("#french",strcharinfo(0));
-				dispbottom ("#TRO: Si quieres volver a leer los mensajes de este canal, activalo por @channels o whispea directamente al canal #french y entraras automaticamente.",0x00FA9A,getcharid(0));
+				dispbottom ("#TRO:If you want to read the messages of this channel again, activate it by @channels or whisper directly to the #french channel and you will automatically enter.",0x00FA9A,getcharid(0));
 
 				}else{
 					#CHANNEL_SETTINGS |= (1 << .@i);
 										next;
 
 					atcommand "@join #french";
-					dispbottom ("#TRO: Whispea a #french y escribe un mensaje para mandarlo al canal, si quieres dejar de leer los mensajes de este canal, desactivalo por @channels.",0xFFFF00,getcharid(0));
+					dispbottom ("#TRO:Whisper to #french and write a message to send to this channel, If you want to stop reading the messages on this channel, disable it by @channels.",0xFFFF00,getcharid(0));
 
 				}
 				break;
@@ -170,14 +170,14 @@
 									next;
 
 				channel_kick("#deutsch",strcharinfo(0));
-				dispbottom ("#TRO: Si quieres volver a leer los mensajes de este canal, activalo por @channels o whispea directamente al canal #deutsch y entraras automaticamente.",0x00FA9A,getcharid(0));
+				dispbottom ("#TRO:If you want to read the messages of this channel again, activate it by @channels or whisper directly to the #deutsch channel and you will automatically enter.",0x00FA9A,getcharid(0));
 
 				}else{
 					#CHANNEL_SETTINGS |= (1 << .@i);
 										next;
 
 					atcommand "@join #deutsch";
-					dispbottom ("#TRO: Whispea a #deutsch y escribe un mensaje para mandarlo al canal, si quieres dejar de leer los mensajes de este canal, desactivalo por @channels.",0xFFFF00,getcharid(0));
+					dispbottom ("#TRO:Whisper to #deutsch and write a message to send to this channel, If you want to stop reading the messages on this channel, disable it by @channels.",0xFFFF00,getcharid(0));
 
 				}
 				break;
