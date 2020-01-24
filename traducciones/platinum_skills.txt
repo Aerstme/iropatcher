@@ -22,13 +22,13 @@
 
 prontera,128,194,7	script	Platinum Skills	742,{
 	mes "[ ^2e9c99Platinum Skills^000000 ]";
-	mes "¡Hola!";
-	mes "Conmigo puedes conseguir las ^800080habilidades especiales^000000 disponibles para tu ^FF6133job^000000.";
-	mes "¿Te gustaria recibirlas ahora?";
+	mes "Hello!";
+	mes "With me you can get ^800080Special skills^000000 available for your^FF6133job^000000.";
+	mes "Would you like to receive them now?";
 	next;
-	if (select("~ ^009900Si, por favor^000000.:~ ^FF0000No, gracias^000000.") == 2) {
+	if (select("~ ^009900Yes, please^000000.:~ ^FF0000No, Thanks^000000.") == 2) {
 		mes "[ ^2e9c99Platinum Skill^000000 ]";
-		mes "Bueno, espero que tengas un buen dia! >.>";
+		mes "Well, Have a nice day! >.>";
 		close;
 	}
 	skill "NV_FIRSTAID",1,SKILL_PERM;
@@ -139,7 +139,7 @@ prontera,128,194,7	script	Platinum Skills	742,{
 		break;
 	}
 	mes "[ ^00BFFFPlatinum Skills^000000 ]";
-	mes "^009900¡Listo!^000000";
+	mes "^009900Ready!^000000";
 	close;
 
 OnInit:
