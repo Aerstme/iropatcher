@@ -2,12 +2,12 @@ prontera,164,155,3	script	Repair Man	851,{
 	.@repairprice = 70000;
 	.@npc_name$ = "^00BFFF^00BFFFRepair Man^000000^000000";
 	mes "[ "+ .@npc_name$ +" ]";
-	mes "Hola!";
-	mes "Soy el ^800080reparador^000000 oficial de Rune Midgard.";
-	mes "Conmigo podrás ^800080reparar^000000 todos tus ^FF8C00items^000000.";
-	mes "Te gustaría ^800080repararlos^000000?";
+	mes "Hello!";
+	mes "I am the official ^800080repair man^000000 of Rune Midgard.";
+	mes "With me you can ^800080repair^000000 all your ^FF8C00items^000000.";
+	mes "Do you like to ^800080repair them^000000?";
 	next;
-	switch(select("~ ^009900Entregar Item(s)^000000:~ ^FF0000No^000000 quiero, gracias.")) {
+	switch(select("~ ^009900Give Item(s)^000000:~ ^FF0000No^000000 i dont want, thanks.")) {
 	case 1:
 		.@checkitem = 1;
 		while (1) {
@@ -19,26 +19,26 @@ prontera,164,155,3	script	Repair Man	851,{
 		.@checkitem = .@checkitem-1;
 		if (!.@checkitem) {
 			mes "[ "+ .@npc_name$ +" ]";
-			mes "~ ^FF0000Al parecer cuidas bien tus cosas, no tienes nada para reparar... con personas como tú, me quedaré sin empleo!!^000000";
+			mes "~ ^FF0000Apparently you take care your items, you have nothing to repair! ... with people like you i will be unemployed !!^000000";
 			close;
 		}
 		mes "[ "+ .@npc_name$ +" ]";
 		mes "Hmm...";
-		mes "Veamos que tienes...";
-		mes "Tienes " + .@checkitem + " item(s) dañado(s).";
-		mes "Te gustaría ^800080repararlo(s)^000000 ahora?";
+		mes "Let's see what you have...";
+		mes "You have" + .@checkitem + " damaged item(s).";
+		mes "Do you like ^800080repair them^000000 now?";
 		next;
 		.@totalcost = .@repairprice*.@checkitem;
 		mes "[ "+ .@npc_name$ +" ]";
-		mes "Cada ^800080reparación^000000 cuesta " + .@repairprice + "z.";
-		mes "Así que ^FF8C00todo^000000 saldría por " + .@totalcost + "z."; 
-		mes "Estás ^009900conforme^000000?";
+		mes "Each ^800080repair^000000 cost " + .@repairprice + "z.";
+		mes "So ^FF8C00Everything^000000 will cost " + .@totalcost + "z."; 
+		mes "Are you ^009900Agree^000000?";
 		next;
-		switch(select("~ ^009900Sí^000000:~ ^FF0000No^000000")) {
+		switch(select("~ ^009900Yes^000000:~ ^FF0000No^000000")) {
 		case 1:
 			if (Zeny < .@totalcost) {
 				mes "[ "+ .@npc_name$ +" ]";
-				mes "~ ^FF0000Lo siento, no tienes Zeny suficiente para reparar tu(s) Item(s).^000000";
+				mes "~ ^FF0000Im sorry,you dont have enough zeny to repair your items.^000000";
 				close;
 			}
 			.@checkitem2 = 1;
@@ -56,18 +56,18 @@ prontera,164,155,3	script	Repair Man	851,{
 					.@checkitem = .@checkitem-1;
 				}
 				mes "[ "+ .@npc_name$ +" ]";
-				mes "^009900¡Listo!^000000";
-				mes "Esta vez intenta ser algo mas ^FF6133cuidadoso^000000.";
+				mes "^009900Ready!^000000";
+				mes "This time try to be ^FF6133careful^000000.";
 				close;
 			}
 		case 2:
 			mes "[ "+ .@npc_name$ +" ]";
-			mes "Bueno... ^FF6133vuelve^000000 cuando quieras ^^";
+			mes "Good... ^FF6133Come back^000000 anytime ^^";
 			close;
 		}
 	case 2:
 		mes "[ "+ .@npc_name$ +" ]";
-		mes "Bueno, ^FF6133vuelve^000000 cuando quieras...";
+		mes "Good, ^FF6133Come back^000000 anytime...";
 		close;
 	}
 OnInit:
