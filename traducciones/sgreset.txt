@@ -7,14 +7,14 @@ prontera,124,198,7	script	SG Resetter	644,{
 	}
 
    mes "[ ^2e9c99SG Reset^000000 ]";
-   mes "¡Hola!";
-   mes "Conmigo puedes ^800080resetear^000000 a tu Star Gladiator.";
-   mes "¿Qué te gustaría ^800080resetear^000000?";
+   mes "Hello!";
+   mes "With me you can ^800080reset^000000 Your Star Gladiator.";
+   mes "Would you liked to ^800080resetr^000000?";
    menu "~ ^1E90FFReset Feeling^000000.",feeling,"~ ^FF6133Reset Hatred^000000.",hatred;
 
 feeling:
    atcommand "@feelreset";
-   mes "^009900¡Listo!^000000";
+   mes "^009900Ready!^000000";
    close2;
    cutin "",255;
    end;
@@ -26,9 +26,9 @@ hatred:
    mes "^FF6133Ya casi pero^000000...";
    next;
    mes "[ ^2e9c99SG Reset^000000 ]";
-   mes "Necesitarás reloguear para que el ^FF6133Hatred^000000 se ^800080reseteé^000000 de manera correcta.";
-   mes "¿Deseas reloguear ahora?";
-   menu "~ ^009900Si, por favor^000000.",relog,"~ ^FF0000No, gracias^000000.",later;
+   mes "You will need relog so that the ^FF6133Hatred^000000 get ^800080reset^000000 correctly.";
+   mes "Do you want relog now?";
+   menu "~ ^009900Yes, Please^000000.",relog,"~ ^FF0000No, Thanks^000000.",later;
 
 relog:
    atcommand "@kick "+strcharinfo(0);
@@ -37,7 +37,7 @@ relog:
 later:
    next;
    mes "[ ^2e9c99SG Reset^000000 ]";
-   mes "~ ^FF0000Está bien pero recuerda que el Hatred no se reseteará hasta que reloguees.^000000";
+   mes "~ ^FF0000Its fine but remember that Hatred will not reset until you relog.^000000";
    close2;
    
 OnInit:
