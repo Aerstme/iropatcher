@@ -1,9 +1,9 @@
 // Weapon/Armor Refiners
 //============================================================
-prontera,150,150,0	script	Refinador	85,{
+prontera,150,150,0	script	Refinary	85,{
 	mes "1";
 	next;
-	menu "~ Refinado Normal", M1, "~ Refinado Especial (+1/-1)", M2, "~ Refinado Seguro (100%)", M3; 
+	menu "~ Normal Refined", M1, "~ Special Refined (+1/-1)", M2, "~ Safe Refined (100%)", M3; 
 	M1: callfunc "refinemain2","Refinador",0;
 	M2: callfunc "special_refine","Refinador";
 	M3: callfunc "safe_refine","Refinador";
@@ -103,16 +103,16 @@ function	script	refinemain2	{
 			mes "["+ .@npc_name$ +"]";
 			mes "Yeah...";
 			mes "There's no need to";
-			mes "rush. Take your time.";
+			mes "Rush. Take your time.";
 			close;
 		}
 		if(getequippercentrefinery(.@part) < 100) {
 			mes "["+ .@npc_name$ +"]";
 			mes "Oh no! If I continue to";
-			mes "refine this, there's a risk it could";
+			mes "Refine this, there's a risk it could";
 			switch(.@material) {
 			case 985:
-				mes "be destroyed! That means that ^FF0000this equipment^000000, and ^FF0000any cards^000000 or special properties added to this armor, ^FF0000will be gone^000000.";
+				mes "Be destroyed! That means that ^FF0000this equipment^000000, and ^FF0000any cards^000000 or special properties added to this armor, ^FF0000will be gone^000000.";
 				break;
 			default:
 				mes "be destroyed, and you'd ^FF0000lose the weapon^000000, any ^FF0000cards in the weapon^000000,";
