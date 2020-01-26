@@ -2,19 +2,19 @@ prontera,124,198,7	script	SG Resetter	644,{
 
 	if(JobLevel < 99 || BaseLevel < 255 || Class != 4047){
 		mes "[ ^2e9c99SG Reset^000000 ]";
-		mes "~ ^FF0000Mi servicio solo está disponible para Star Gladiator's de nivel 255/99^000000.";
+		mes "~ ^FF0000My service is only available for Mi servicio solo estÃ¡ disponible para Star Gladiator's de nivel 255/99^000000.";
 		close;
 	}
 
    mes "[ ^2e9c99SG Reset^000000 ]";
-   mes "¡Hola!";
+   mes "Â¡Hola!";
    mes "Conmigo puedes ^800080resetear^000000 a tu Star Gladiator.";
-   mes "¿Qué te gustaría ^800080resetear^000000?";
+   mes "Â¿QuÃ© te gustarÃ­a ^800080resetear^000000?";
    menu "~ ^1E90FFReset Feeling^000000.",feeling,"~ ^FF6133Reset Hatred^000000.",hatred;
 
 feeling:
    atcommand "@feelreset";
-   mes "^009900¡Listo!^000000";
+   mes "^009900Â¡Listo!^000000";
    close2;
    cutin "",255;
    end;
@@ -26,8 +26,8 @@ hatred:
    mes "^FF6133Ya casi pero^000000...";
    next;
    mes "[ ^2e9c99SG Reset^000000 ]";
-   mes "Necesitarás reloguear para que el ^FF6133Hatred^000000 se ^800080reseteé^000000 de manera correcta.";
-   mes "¿Deseas reloguear ahora?";
+   mes "NecesitarÃ¡s reloguear para que el ^FF6133Hatred^000000 se ^800080reseteÃ©^000000 de manera correcta.";
+   mes "Â¿Deseas reloguear ahora?";
    menu "~ ^009900Si, por favor^000000.",relog,"~ ^FF0000No, gracias^000000.",later;
 
 relog:
@@ -37,7 +37,7 @@ relog:
 later:
    next;
    mes "[ ^2e9c99SG Reset^000000 ]";
-   mes "~ ^FF0000Está bien pero recuerda que el Hatred no se reseteará hasta que reloguees.^000000";
+   mes "~ ^FF0000EstÃ¡ bien pero recuerda que el Hatred no se resetearÃ¡ hasta que reloguees.^000000";
    close2;
    
 OnInit:
