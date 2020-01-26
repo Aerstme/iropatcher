@@ -111,7 +111,7 @@ prontera,143,179,7	script	PvP Rank	866,{
 					"September.",
 					"October.",
 					"November.",
-					"Dicember."
+					"December."
 				) - 1;
 				if (.@month <= 0)
 					.@month = .month;
