@@ -311,23 +311,23 @@ D29: Restrict("RE",7,8);
 	 Pick("","moc_pryd01","moc_pryd02","moc_pryd03","moc_pryd04","moc_pryd05","moc_pryd06");
 D30: if ( $RA_SAN_UNLOCK < 300 ) {
 		mes "[ ^2e9c99Warper^000000 ]";
-		mes "Rachel Sanctuary está actualmente ^ff0000bloqueado^000000.";
-		mes "Para ^009900desbloquearlo^000000, la comunidad debe donar "+F_InsertComma(300000000)+"z en total.";
+		mes "Rachel Sanctuary actually is ^ff0000locked^000000.";
+		mes "For ^009900Unlock^000000, the community must donate "+F_InsertComma(300000000)+"z total.";
 		mes " ";
-		mes "Estado actual: "+ $RA_SAN_UNLOCK +" / 300 ^FF6133Millones^000000.";
+		mes "Actual State: "+ $RA_SAN_UNLOCK +" / 300 ^FF6133Millones^000000.";
 		next;
-		if(select("~ ^009900Donar 1,000,000z^000000.:~ ^FF0000No quiero, gracias^000000.")==2)close;
+		if(select("~ ^009900Donate 1,000,000z^000000.:~ ^FF0000I dont want, Thanks^000000.")==2)close;
 		.@amt = 1000000;
 		if ( Zeny < .@amt ) {
 			mes "[ ^2e9c99Warper^000000 ]";
-			mes "~ ^FF0000No tienes zeny suficiente para realizar la donación^000000.";
+			mes "~ ^FF0000You do not have enough zeny to make the donation^000000.";
 			close;
 		}
 		Zeny -= .@amt;
 		$RA_SAN_UNLOCK++;
 		mes "[ ^2e9c99Warper^000000 ]";
-		mes "^009900¡Listo!^000000";
-		mes "Donación actual: "+ $RA_SAN_UNLOCK +" / 300 ^FF6133Millones^000000.";
+		mes "^009900Ready!^000000";
+		mes "Current Donation: "+ $RA_SAN_UNLOCK +" / 300 ^FF6133Million^000000.";
 		close;
 	 }
 	 setarray @c[2],140,11,32,21,8,149,204,218,150,9;
