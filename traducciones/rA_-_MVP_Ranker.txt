@@ -63,7 +63,7 @@ prontera,139,183,7	script	MvP Rank	863,{
 					"September.",
 					"October.",
 					"November.",
-					"Dicember."
+					"December."
 				) - 1;
 				if (.@month <= 0)
 					.@month = .month;
