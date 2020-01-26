@@ -17,7 +17,7 @@
 	switch(select("~ ^009900Turn into Costume^000000.:~ ^1E90FFRestore costume^000000.:~ ^FF0000No, Thanks^000000.")) {
 	case 1:
 			mes "[ ^2e9c99Costume Clown^000000 ]";
-			mes "Por favor, selecciona el item que quieras ^800080convertir^000000.";
+			mes "Please, selecte the item what you want to ^800080convert^000000.";
 			mes "~ ^FF0000Nota: You will lost the refinement and the cards equipped in the item what do you want to turn into a costume, be careful^000000.";
 			next;
 				setarray .@Position$[1],"Top","Mid","Low";
@@ -39,11 +39,11 @@
 			mes "[ ^2e9c99Costume Clown^000000 ]";
 			mes "Do you want to ^800080turn into^000000 costume your " + getitemname(getequipid(.@Part)) + "?";
 			next;
-			if( select("~ ^009900Si, por favor^000000.:~ ^FF0000No, gracias^000000.") == 2 )
+			if( select("~ ^009900Yes, Please^000000.:~ ^FF0000No, Thanks^000000.") == 2 )
 			{
 				mes "[ ^2e9c99Costume Clown^000000 ]";
 				mes "Oh, you need some time to think about it, eh?";
-				mes "Está bien, es entendible.";
+				mes "Its Ok, I Understand.";
 				close;
 			}
 			costume .@Part; // Convert the Headgear
@@ -80,7 +80,7 @@
 			mes "[ ^2e9c99Costume Clown^000000 ]";
 			mes "Do you want to^FF6133restore^000000 your Costumes " + getitemname(getequipid(.@Part)) + "?";
 			next;
-			if( select("~ ^009900Si, por favor^000000.:~ ^FF0000No, gracias^000000.") == 2 )
+			if( select("~ ^009900Yes, Please^000000.:~ ^FF0000No, Thanks^000000.") == 2 )
 			{
 				mes "[ ^2e9c99Costume Clown^000000 ]";
 				mes "Oh, you need some time to think about it, eh?";
