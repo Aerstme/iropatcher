@@ -1,3 +1,5 @@
 //1 2007-11-13data.thor
 //2 2007-11-17palettes.thor
 1 12072020_skillinfoz.thor
+2 21072020_data.thor
+3 21072020_iteminfo.thor
