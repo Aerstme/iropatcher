@@ -5,3 +5,4 @@
 3 21072020_iteminfo.thor
 4 iteminfo_12082020.thor
 5 thormap_12082020.thor
+6 general_16082020.thor
