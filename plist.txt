@@ -10,3 +10,4 @@
 8 19082020_iteminfo.thor
 9 19082020_skill.thor
 10 iteminfo_27082020.thor
+11 blackblinker_28082020.thor
